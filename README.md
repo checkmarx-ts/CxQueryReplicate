@@ -1,5 +1,6 @@
 <!-- -*- coding: utf-8-dos; -*- -->
-= Introduction =
+Introduction
+============
 
 **CxQueryReplicate** is a utility that replicates customized CxSAST
 queries from one CxSAST instance to another. The current version of
@@ -7,12 +8,14 @@ queries from one CxSAST instance to another. The current version of
 at the corporate and team levels. Replication of queries customized at
 the project level is an enhancement that is planned for the future.
  
-= Installation =
+Installation
+============
 
-== Using pip
+Using pip
+------------
 
-
-= Usage =
+Usage
+=====
 
 The installation process adds the **cxqueryreplicate** command to the
 user’s command search path.
@@ -40,7 +43,8 @@ arguments:
   used to connect to the source CxSAST instance.
 
 
-== Configuration ===
+Configuration
+-------------
 
 The **CxQueryReplicate** utility expects its configuration to be
 stored in a Windows “.ini” file.
@@ -63,7 +67,8 @@ password = srcpassword
 
 ```
 
-== User Role Requirements ==
+User Role Requirements
+======================
 
 The user for the source instance must have the *SAST Auditor* role.
 
@@ -73,7 +78,8 @@ Manager* and *SAST Auditor* roles.
 Both users must be members of the root team in their respective
 instances (i.e., the `/CxServer` team).
 
-= Development =
+Development
+===========
 
 The easiest way to set up an environment for developing
 **CxQueryReplicate** is to clone this repository and then use the
