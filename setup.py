@@ -21,12 +21,12 @@ setup(
         'Development Status :: 3 - Alpha',
         'Intended Audience :: System Administrators',
         'License :: OSI Approved :: Apache Software License v2.0',
-        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.7',
         'Topic :: CxSAST Administration :: Utilities',
     ],
     keywords='Checkmarx Query Replication',
     packages=['cxqueryreplicate'],
-    python_requires='>=3.8',
+    python_requires='>=3.7',
     install_requires=install_requires,
     extras_require={
         'tests': install_requires + tests_require
