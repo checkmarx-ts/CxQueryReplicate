@@ -8,6 +8,3 @@ checkmarxpythonsdk = "*"
 
 [dev-packages]
 requests_mock = "*"
-
-[requires]
-python_version = "3.7"
