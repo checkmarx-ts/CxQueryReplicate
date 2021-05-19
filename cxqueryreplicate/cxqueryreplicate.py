@@ -268,12 +268,15 @@ def update_src_query_groups(src_query_groups, dst_query_groups, team_map):
                 dst_query = None
             if dst_query:
                 logger.debug('Query found in destination instance')
+                logger.debug(f'Setting query id to {dst_query[QUERY_ID]}')
+                src_query[QUERY_ID] = dst_query[QUERY_ID]
                 logger.debug(f'Setting query package id to {dst_query_group[PACKAGE_ID]}')
                 src_query[PACKAGE_ID] = dst_query_group[PACKAGE_ID]
                 logger.debug('Setting status to "Edited"')
                 src_query[STATUS] = 'Edited'
             else:
                 logger.debug('Query not found in destination instance')
+                logger.debug('Setting query id to 0')
                 src_query[QUERY_ID] = 0
                 if dst_query_group:
                     logger.debug(f'Setting query package id to {dst_query_group[PACKAGE_ID]}')
