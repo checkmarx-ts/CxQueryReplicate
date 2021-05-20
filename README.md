@@ -85,79 +85,108 @@ have added to the user’s command search path).
 The **CxQueryReplicate** utility can be configured via a configuration
 file, via the command line or by a mixture of both.
 
-Due to its use of the Checkmarx Python SDK, the **cxqueryreplicate**
-command expects that the details of a CxSAST instance are specified
-either in a configuration file or via environment variables.
+The **CxQueryReplicate** utility uses the [Checkmarx Python SDK]()
+and, specifically, uses the SDK’s configuration to access the source CxSAST instance. The SDK configuration can be specified in any, or a mixture of, the following ways:
 
-## Command Line Options
+- Via a configuration file
+- Via environment variables
+- Via command line arguments
 
-The **cxqueryreplicate** command accepts the following command line
-options:
+The default SDK configuration file is named `config.ini` and can be
+found in the `.Checkmarx` subdirectory of the user’s home
+directory. The location of the SDK configuration file can be
+overridden using the `checkmarx_config_path` environment variable or
+the `--checkmarx_config_path` command line option.
 
-* `--config-file=FILE`: specify the location of the configuration
-  file.
-* `--dry-run`: list the actions that would be performed but do not
-  perform them.
-* `--dst-base-url=URL`: specify the base URL of the destination CxSAST
-  instance.
-* `--dst-password=PASSWORD`: specify the password of the user to be
-  used to connect to the destination CxSAST instance.
-* `--dst-username=USERNAME`: specify the username of the user to be
-  used to connect to the destination CxSAST instance.
-* `-h` or `--help`: print a usage message and exit.
-* `--log-level=LEVEL`: specify the level of logging. By default, only
-  informational, warning and error messages are logged.
-* `--src-base-url=URL`: specify the base URL of the source CxSAST
-  instance.
-* `--src-password=PASSWORD`: specify the password of the user to be
-  used to connect to the source CxSAST instance.
-* `--src-username=USERNAME`: specify the username of the user to be
-  used to connect to the source CxSAST instance.
+The SDK configuration file is a Windows-style “.ini” file, with the
+CXSAST details contained in the `checkmarx` section. The following
+parameters *must* be configured:
 
+- `base_url`: The base URL of the source CxSAST instance.
+- `client_id`: The clint identifier sent in the authorization token
+  request. This must always be “resource_owner_client”.
+- `client_secret`: The client secret sent in the authorization token
+  request. This must always be “014DF517-39D1-4453-B7B3-9930C563627C”.
+- `grant_type`: The grant type sent in the authorization token
+  request. This must always be “password”.
+- `max_try`: Te maximum number of times to retry an API operation
+  which has failed.
+- `password`: The password of the user with which to connect to the
+  source CxSAST instance.
+- `scope`: The scope sent in the authorization token request. This
+  must always include “sast_rest_api”.
+- `username`: The username of the user with which to connect to the
+  source CxSAST instance.
 
-## Configuration File
+When specifying the configuration parameters via environment
+variables, “cxsast_” should be prepended to the parameter name. For
+example, the `cxsast_base_url` environment variable could be used to
+specify the base URL of the source CxSAST instance.
 
-The `--config-file` command line option can be used to specify a file
-containing the **CxQueryReplicate** utility’s configuration. This file
-must be a Windows-style “.ini” file. This file can contain any of the
-the following sections (enclosed in square brackets):
+When specifying the configuration parameters via command line options,
+“--cxsast_” should be prepended to the parameter name. For example,
+the `--cxsast_base_url` command line option could be used to specify
+the base URL of the source CxSAST instance.
 
-- `main`: this section contains general configuration items.
-   The following configuration items are recognized in this section:
-   - `dry_run`: if set to true, list the actions that would be
-     performed but do not perform them.
-- `source`: this section contains details of the source CxSAST
-  instance.
-  The following configuration items are recognized in this section:
-  - `base_url`: the base URL of the source CxSAST instance.
-  - `password`: the password of the user to be used to connect to the
-    source CxSAST instance.
-  - `username`: the username of the user to be used to connect to the
-    source CxSAST instance.
-- `destination`: this section contains details of the destination
-  CxSAST instance.
-  - `base_url`: the base URL of the destination CxSAST instance.
-  - `password`: the password of the user to be used to connect to the
-    destination CxSAST instance.
-  - `username`: the username of the user to be used to connect to the
-    destination CxSAST instance.
+In addition to the SDK configuration parameters, the
+**CxQueryReplicate** has its own configuration parameters which
+specify the details of the destination CxSAST instance. These
+parameters can be specified either via a configuration file or via
+command line options. Configuration via environment variables is not
+supported.
 
-### Sample Configuration file
-Here is a sample configuration file.
+There is no default location for the configuration file: if a
+configuration file is to be used, its location must be specified via
+the `--config-file` command line option.
+
+The **CxQueryReplicate** configuration file is also a Windows-style
+“.ini” file.  The following configuration parameters must be
+configured in the `destination` section:
+
+- `base_url`: The base URL of the destination CxSAST instance.
+- `password`: The password of the user used to connect to the
+  destination CxSAST instance.
+- `username`: The username of the user used to connect to the
+  destination CxSAST instance.
+
+When specifying the above configuration parameters via the command
+line options, “--dst_” should be prepended to the parameter name. For
+example. the `--dst_base_url` command line option could be used to
+specify the base URL of the destination CxSAST instance.
+
+The following parameter may be configured in the `main` section of the
+configuration file:
+
+- `dry_run`: Specifies whether to run in “dry run” mode.
+
+When specifying the above configuration parameter via the command
+line, `--dry_run` should be used (to enable “dry run” mode).
+
+### Sample Configuration Files
+Here is a sample SDK configuration file:
 
 ```
-[main] dry_run = False
+[checkmarx]
+base_url = https://src.example.com
+username = srcuser
+password = dstpassword
+grant_type = password
+scope = sast_rest_api
+client_id = resource_owner_client
+client_secret = 014DF517-39D1-4453-B7B3-9930C563627C
+max_try = 3
+```
+
+Here is a sample **CxQueryReplicate** configuration file.
+
+```
+[main]
+dry_run = False
 
 [destination]
 base_url = https://dst.example.com
 username = dstuser
 password = dstpassword
-
-[source]
-base_url = https://src.example.com
-username = srcuser
-password = srcpassword
-
 ```
 
 # User Role Requirements

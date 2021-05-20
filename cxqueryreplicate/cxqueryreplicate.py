@@ -33,7 +33,6 @@ CFG_DESTINATION = 'destination'
 CFG_DRY_RUN = 'dry_run'
 CFG_MAIN = 'main'
 CFG_PASSWORD = 'password'
-CFG_SOURCE = 'source'
 CFG_USERNAME = 'username'
 
 CORPORATE = 'Corporate'
@@ -100,12 +99,6 @@ def load_config(args):
         config[CFG_DESTINATION] = {}
 
     # Allow command-line override
-    if args.src_base_url:
-        config[CFG_SOURCE][CFG_BASE_URL] = args.src_base_url
-    if args.src_username:
-        config[CFG_SOURCE][CFG_USERNAME] = args.src_username
-    if args.src_password:
-        config[CFG_SOURCE][CFG_PASSWORD] = args.src_password
     if args.dst_base_url:
         config[CFG_DESTINATION][CFG_BASE_URL] = args.dst_base_url
     if args.dst_username:
@@ -114,12 +107,6 @@ def load_config(args):
         config[CFG_DESTINATION][CFG_PASSWORD] = args.dst_password
     config[CFG_MAIN][CFG_DRY_RUN] = str(args.dry_run)
 
-    if CFG_BASE_URL not in config[CFG_SOURCE]:
-        raise QueryReplicateException('Base URL of source instance not specified')
-    if CFG_USERNAME not in config[CFG_SOURCE]:
-        raise QueryReplicateException('Username of user for source instance not specified')
-    if CFG_PASSWORD not in config[CFG_SOURCE]:
-        raise QueryReplicateException('Password of user for source instance not specified')
     if CFG_BASE_URL not in config[CFG_DESTINATION]:
         raise QueryReplicateException('Base URL of destination instance not specified')
     if CFG_USERNAME not in config[CFG_DESTINATION]:
@@ -141,11 +128,10 @@ def replicate_teams(config):
 
     team_api = TeamAPI()
     team_map = {}
-    with ConfigOverride(config[CFG_SOURCE]):
-        src_teams = {}
-        for team in team_api.get_all_teams():
-            src_teams[team.full_name] = team
-        logger.debug(f'Source teams: {src_teams}')
+    src_teams = {}
+    for team in team_api.get_all_teams():
+        src_teams[team.full_name] = team
+    logger.debug(f'Source teams: {src_teams}')
 
     with ConfigOverride(config[CFG_DESTINATION]):
         dst_teams = {}
@@ -186,11 +172,10 @@ def replicate_queries(config, team_map):
     """Replicate custom queries from one CxSAST instance to another."""
     logger.debug('Starting')
 
-    with ConfigOverride(config[CFG_SOURCE]):
-        src_query_groups = retrieve_query_groups()
-        if not src_query_groups:
-            logger.info('No source queries found.')
-            return 0
+    src_query_groups = retrieve_query_groups()
+    if not src_query_groups:
+        logger.info('No source queries found.')
+        return 0
 
     with ConfigOverride(config[CFG_DESTINATION]):
         dst_query_groups = retrieve_query_groups()
@@ -386,23 +371,17 @@ def replicate_teams_and_queries(config):
 def main():
 
     parser = argparse.ArgumentParser(description='Replicate CxSAST custom queries')
-    parser.add_argument('--config-file', metavar='FILE',
+    parser.add_argument('--config_file', metavar='FILE',
                         help='The configuration file')
-    parser.add_argument('--src-base-url', metavar='BASE_URL',
-                        help='The base URL of the source CxSAST instance')
-    parser.add_argument('--src-username', metavar='USERNAME',
-                        help='The username for the source CxSAST instance')
-    parser.add_argument('--src-password', metavar='PASSWORD',
-                        help='The password for the source CxSAST instance')
-    parser.add_argument('--dst-base-url', metavar='BASE_URL',
+    parser.add_argument('--dst_base_url', metavar='BASE_URL',
                         help='The base URL of the destination CxSAST instance')
-    parser.add_argument('--dst-username', metavar='USERNAME',
+    parser.add_argument('--dst_username', metavar='USERNAME',
                         help='The username for the destination CxSAST instance')
-    parser.add_argument('--dst-password', metavar='PASSWORD',
+    parser.add_argument('--dst_password', metavar='PASSWORD',
                         help='The password for the destination CxSAST instance')
-    parser.add_argument('--log-level', metavar='LEVEL', default='INFO',
+    parser.add_argument('--log_level', metavar='LEVEL', default='INFO',
                         help='The log level')
-    parser.add_argument('--dry-run', action='store_true', default=False,
+    parser.add_argument('--dry_run', action='store_true', default=False,
                         help='Dry run')
 
     args = parser.parse_args()
