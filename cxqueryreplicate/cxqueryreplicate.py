@@ -24,6 +24,7 @@ import configparser
 import datetime
 import logging
 import logging.config
+import os.path
 import pprint
 import sys
 
@@ -92,7 +93,11 @@ def load_config(args):
 
     config = configparser.ConfigParser()
     if args.config_file:
-        config.read(args.config_file)
+        logger.debug(f'Loading configuration from {args.config_file}')
+        if os.path.isfile(args.config_file):
+            config.read(args.config_file)
+        else:
+            raise QueryReplicateException(f'{args.config_file}: file does not exist')
     else:
         config[CFG_MAIN] = {}
         config[CFG_SOURCE] = {}
