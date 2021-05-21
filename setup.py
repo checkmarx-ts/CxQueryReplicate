@@ -1,6 +1,6 @@
 from setuptools import setup
 
-_version = '1.0.0a'
+_version = '1.0.0rc1'
 
 install_requires = [
     'checkmarxpythonsdk'
