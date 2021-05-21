@@ -12,68 +12,35 @@ the project level is an enhancement that is planned for the future.
 The simplest way to install **CxQueryReplicate** is to use the
 **pip3** command (Linux) or the **pip** command (Windows). The
 following instructions assume a Linux environment and so use the
-**pip3** command.
+**pip3** command and show a Linux shell prompt.
 
-The following commands will clone the **CxQueryReplicate** source code
-repository and install **CxQueryReplicate** for the current user:
+Download the release wheel file from the [releases
+page](https://github.com/checkmarx-ts/CxQueryReplicate/releases) of
+the **CxQueryReplicate** GitHub repository. Running the following
+comman in the directory to which the wheel file has been saved will
+install **CxQueryReplicate** for the current user. To install it for
+system-wide use, omit the `--user` command line option.
 
 ```
-git clone https://github.com/checkmarx-ts/CxQueryReplicate.git
-pip3 install --user CxQueryReplicate
+$ pip3 install --user cxqueryreplicate-1.0.0rc1-py3-none-any.whl
 ```
 
-It is also possible to use the **pipenv** command to create a virtual
-environment with **CxQueryReplicate**'s dependencies and then use the
-**pip3** command to install **CxQueryReplicate** itself.
+After installation, the **cxqueryreplicate** command will have been
+added to the command search path.
+
+For further isolation, the above can be performed in a virtual
+environment created by the **pipenv** command:
+
+```
+$ pipenv --python 3
+$ pip3 install --user cxqueryreplicate-1.0.0rc1-py3-none-any.whl
+```
 
 If the **pipenv** command is not present in the installation
 environment, it can be installed with the following command:
 
 ```
-$ pip3 install pipenv
-```
-
-Clone the **CxQueryReplicate** repository:
-
-```
-$ git clone https://github.com/checkmarx-ts/CxQueryReplicate.git
-```
-
-Change directory to the `CxQueryReplicate` directory and initialize a virtual environment:
-
-```
-$ cd CxQueryReplicate
-$ pipenv --python 3
-```
-
-Install **CxReplicateQuery**’s dependencies and start a new shell in
-the virtual environment:
-
-```
-$ pipenv install
-$ pipenv shell
-```
-
-Install **CxQueryReplicate** itself:
-
-```
-$ pip3 install .
-```
-
-This will add the **cxqueryreplicate** command to the command search path:
-
-```
-$ which cxqueryreplicate
-~/.local/share/virtualenvs/CxQueryReplicate-jQx2tljc/bin/cxqueryreplicate
-```
-
-Of course, it is not required that **CxQueryReplicate** be installed
-in a virtual environment. **CxQueryReplicate** can be installed for
-the current user with the following commands:
-
-```
-git clone https://github.com/checkmarx-ts/CxQueryReplicate.git
-pip3 install --user CxQueryReplicate
+$ pip3 install --user pipenv
 ```
 
 # Configuration and Usage
@@ -205,7 +172,3 @@ The easiest way to set up an environment for developing
 **CxQueryReplicate** is to clone this repository and then use the
 **pipenv** command to create a virtual environment that includes the
 relevant dependencies.
-
-To activate this project's virtualenv, run pipenv shell.
-
-Alternatively, run a command inside the virtualenv with pipenv run.
