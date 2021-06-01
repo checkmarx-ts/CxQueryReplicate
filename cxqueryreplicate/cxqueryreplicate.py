@@ -34,6 +34,7 @@ CFG_DESTINATION = 'destination'
 CFG_DRY_RUN = 'dry_run'
 CFG_MAIN = 'main'
 CFG_PASSWORD = 'password'
+CFG_SCOPE = 'scope'
 CFG_USERNAME = 'username'
 
 CORPORATE = 'Corporate'
@@ -63,7 +64,7 @@ logger = logging.getLogger(__name__)
 class ConfigOverride:
     """A context manager that allows the use of multiple CxSAST instances."""
 
-    keys = [CFG_BASE_URL, CFG_USERNAME, CFG_PASSWORD]
+    keys = [CFG_BASE_URL, CFG_USERNAME, CFG_PASSWORD, CFG_SCOPE]
 
     def __init__(self, new_config):
 
@@ -118,6 +119,8 @@ def load_config(args):
         raise QueryReplicateException('Username of user for destination instance not specified')
     if CFG_PASSWORD not in config[CFG_DESTINATION]:
         raise QueryReplicateException('Password of user for destination instance not specified')
+
+    config[CFG_DESTINATION][CFG_SCOPE] = 'access_control_api sast_rest_api'
 
     return config
 
