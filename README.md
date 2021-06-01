@@ -6,7 +6,7 @@ queries from one CxSAST instance to another. The current version of
 **CxQueryReplicate** only supports replication of queries customized
 at the corporate and team levels. Replication of queries customized at
 the project level is an enhancement that is planned for the future.
- 
+
 # Installation
 
 The simplest way to install **CxQueryReplicate** is to use the
@@ -22,7 +22,7 @@ install **CxQueryReplicate** for the current user. To install it for
 system-wide use, omit the `--user` command line option.
 
 ```
-$ pip3 install --user cxqueryreplicate-1.0.0rc1-py3-none-any.whl
+$ pip3 install --user cxqueryreplicate-1.0.0rc2-py3-none-any.whl
 ```
 
 After installation, the **cxqueryreplicate** command will have been
@@ -33,7 +33,7 @@ environment created by the **pipenv** command:
 
 ```
 $ pipenv --python 3
-$ pip3 install --user cxqueryreplicate-1.0.0rc1-py3-none-any.whl
+$ pip3 install --user cxqueryreplicate-1.0.0rc2-py3-none-any.whl
 ```
 
 If the **pipenv** command is not present in the installation
