@@ -295,7 +295,8 @@ def find_query_group(query_group, query_groups):
     """
 
     for qg in query_groups:
-        if query_group[PACKAGE_FULL_NAME] == qg[PACKAGE_FULL_NAME]:
+        if query_group[PACKAGE_FULL_NAME] == qg[PACKAGE_FULL_NAME] and \
+           query_group[OWNING_TEAM] == qg[OWNING_TEAM]:
             return qg
 
     return None
