@@ -51,10 +51,11 @@
         },
         "checkmarxpythonsdk": {
             "hashes": [
-                "sha256:a395c1b4440804327df06ccd738544edb2db2132c11ce30023fd941ff34aad01"
+                "sha256:4bfade8497fb0aff714b8670323ff6d137d6cc236a6d03d1c74297cf4796ef2d",
+                "sha256:efef495334809b81068ff9cfbaf3694574d281e2d7b4c2ab78acee25b0a29f04"
             ],
             "index": "pypi",
-            "version": "==0.2.7"
+            "version": "==0.2.8"
         },
         "defusedxml": {
             "hashes": [
