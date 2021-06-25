@@ -104,7 +104,7 @@ supported.
 
 There is no default location for the configuration file: if a
 configuration file is to be used, its location must be specified via
-the `--config-file` command line option.
+the `--config_file` command line option.
 
 The **CxQueryReplicate** configuration file is also a Windows-style
 “.ini” file.  The following configuration parameters must be
