@@ -5,6 +5,3 @@ name = "pypi"
 
 [packages]
 checkmarxpythonsdk = "*"
-
-[dev-packages]
-requests_mock = "*"

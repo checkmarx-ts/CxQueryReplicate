@@ -7,7 +7,6 @@ install_requires = [
 ]
 
 tests_require = [
-    'requests_mock'
 ]
 
 setup(
