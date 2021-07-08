@@ -101,7 +101,6 @@ def load_config(args):
             raise QueryReplicateException(f'{args.config_file}: file does not exist')
     else:
         config[CFG_MAIN] = {}
-        config[CFG_SOURCE] = {}
         config[CFG_DESTINATION] = {}
 
     # Allow command-line override
