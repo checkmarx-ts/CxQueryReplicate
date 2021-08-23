@@ -46,11 +46,11 @@
         },
         "checkmarxpythonsdk": {
             "hashes": [
-                "sha256:41627a30896ff5315cd0adba4b6da67c8cf3aa73f8d1e0f485a9670f1a1304c6",
-                "sha256:5d48332e668130f071ec37f01b08b4494fbba37c98a0474e73f05897642b79b1"
+                "sha256:2f6595a5c47647c13111cf7afa284d9c02a37ffca1225ec11f3eceaf2543a15a",
+                "sha256:67c3ba1781c9ff15755f4df3b9bdbb7ee6ba4175e9a25a1bd9d67aadcc5bacc0"
             ],
             "index": "pypi",
-            "version": "==0.3.1"
+            "version": "==0.3.3"
         },
         "idna": {
             "hashes": [
