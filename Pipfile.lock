@@ -46,11 +46,11 @@
         },
         "checkmarxpythonsdk": {
             "hashes": [
-                "sha256:0073b0ee086677f0bf277e447fe7b44aa62fdd53775d446f8e889d1936c54f8f",
-                "sha256:74b0b71c9fee1cde3f44d4bc070b2f0f81a1305e06bbe03dd18bce0cf472255b"
+                "sha256:daefc629d97d311d5aabc15be5a9f568a0f40ec9d0e1c64afc935531d1cbf95a",
+                "sha256:df69b872902e3086b013212932346f0bc81d9f528efc9ef245cb4a77854881c7"
             ],
             "index": "pypi",
-            "version": "==0.3.4"
+            "version": "==0.3.6"
         },
         "idna": {
             "hashes": [
@@ -131,10 +131,10 @@
         },
         "pytz": {
             "hashes": [
-                "sha256:83a4a90894bf38e243cf052c8b58f381bfe9a7a483f6a9cab140bc7f702ac4da",
-                "sha256:eb10ce3e7736052ed3623d49975ce333bcd712c7bb19a58b9e2089d4057d0798"
+                "sha256:3672058bc3453457b622aab7a1c3bfd5ab0bdae451512f6cf25f64ed37f5b87c",
+                "sha256:acad2d8b20a1af07d4e4c9d2e9285c5ed9104354062f275f3fcd88dcef4f1326"
             ],
-            "version": "==2021.1"
+            "version": "==2021.3"
         },
         "requests": {
             "hashes": [
