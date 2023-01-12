@@ -1,6 +1,6 @@
 """Utility that replicates teams and custom queries from one CxSAST instance to another."""
 
-# Copyright 2021 Checkmarx
+# Copyright 2021-2023 Checkmarx
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
