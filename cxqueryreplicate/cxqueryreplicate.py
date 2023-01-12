@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from CheckmarxPythonSDK import config as _global_config
+from CheckmarxPythonSDK.CxRestAPISDK import config as _global_config
 from CheckmarxPythonSDK.CxPortalSoapApiSDK import get_query_collection, upload_queries
 from CheckmarxPythonSDK.CxRestAPISDK import TeamAPI
 from CheckmarxPythonSDK.CxRestAPISDK.team.dto import CxTeam
