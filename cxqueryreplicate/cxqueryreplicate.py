@@ -175,7 +175,7 @@ def replicate_teams(config):
     return team_map
 
 
-def replicate_queries(config, team_map):
+def replicate_queries(config, team_map): #base method
     """Replicate custom queries from one CxSAST instance to another."""
     logger.debug('Starting')
 
@@ -185,15 +185,15 @@ def replicate_queries(config, team_map):
         return 0
 
     with ConfigOverride(config[CFG_DESTINATION]):
-        dst_query_groups = retrieve_query_groups()
-        update_src_query_groups(src_query_groups, dst_query_groups, team_map)
+        dst_query_groups = retrieve_query_groups() #handles api call from python SDK and filters results
+        update_src_query_groups(src_query_groups, dst_query_groups, team_map) #handles mapping of queries between src and dest
         if logger.getEffectiveLevel() == logging.DEBUG:
             pp = pprint.PrettyPrinter(indent=2)
             logger.debug(f'src_query_groups: {pp.pformat(src_query_groups)}')
         if config[CFG_MAIN].getboolean(CFG_DRY_RUN):
             logger.debug('Dry run: not uploading queries')
             return 0
-        resp = upload_queries(src_query_groups)
+        resp = upload_queries(src_query_groups) #updates from list of queries using SOAP endpoint
         if resp[IS_SUCCESSFUL]:
             logger.info('Queries loaded successfully')
         else:
@@ -215,8 +215,8 @@ def retrieve_query_groups():
     query_groups = resp[QUERY_GROUPS]
 
     # For now, we only support replication of corporate and team custom queries
-    query_groups = [qg for qg in query_groups
-                    if qg[PACKAGE_TYPE] in [CORPORATE, TEAM]]
+    query_groups = [qg for qg in query_groups #keeping so that toggle for each query level can be implemented later
+                    if qg[PACKAGE_TYPE] in [CORPORATE, TEAM, PROJECT]]
 
     return query_groups
 
@@ -225,9 +225,9 @@ def update_src_query_groups(src_query_groups, dst_query_groups, team_map):
     """Update a list of query groups with information from the destination
 
     Given a list of query groups from a source CxSAST instance, update
-    each quey group, and the queries it contains, with appropriate
+    each query group, and the queries it contains, with appropriate
     values from either the corresponding query group in the
-    desitnation CxSAST instance or from the mapping of teams in the
+    destination CxSAST instance or from the mapping of teams in the
     source CxSASt instance to teams in the destination CxSAST
     instance.
 
