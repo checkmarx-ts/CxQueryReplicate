@@ -275,54 +275,76 @@ def update_src_query_groups(src_query_groups, dst_query_groups, team_map):
     """
 
     for src_query_group in src_query_groups:
-        logger.debug(f'Updating query_group: {src_query_group[PACKAGE_FULL_NAME]}')
-        dst_query_group = find_query_group(src_query_group, dst_query_groups) #match this src query group to particular dst one
-        if dst_query_group:
-            logger.debug('Query group found in destination instance')
-            logger.debug(f'Setting query group package id to {dst_query_group[PACKAGE_ID]}')
-            src_query_group[PACKAGE_ID] = dst_query_group[PACKAGE_ID]
+        if src_query_group[PACKAGE_TYPE] == PROJECT:
+            dst_query_group_project = find_project_names(src_query_group, dst_query_groups, config)
+            if dst_query_group_project:
+                logger.debug('Destination project has custom project queries')
+                src_query_group['ProjectId'] = dst_query_group_project['ProjectId']
+                src_query_group[PACKAGE_ID] = 0
+                src_query_group['PackageTypeName'] = 'Package_' + str(src_query_group['ProjectId'])
+                package_name = src_query_group['PackageFullName'].split(':')
+                src_query_group['PackageFullName'] = package_name[0] + ':' + src_query_group['PackageTypeName'] + ':' + package_name[2]
+                src_query_group[STATUS] = 'New'
+                src_query_group[DESCRIPTION] = ''
+            else:
+                logger.debug('Destination project does not have custom project queries')
+                dst_project = find_destination_project(src_query_group, config)
+                src_query_group['ProjectId'] = dst_project.project_id
+                src_query_group[PACKAGE_ID] = 0
+                src_query_group['PackageTypeName'] = 'Package_' + str(dst_project.project_id)
+                package_name = src_query_group['PackageFullName'].split(':')
+                src_query_group['PackageFullName'] = package_name[0] + ':' + src_query_group['PackageTypeName'] + ':' + package_name[2]
+                src_query_group[STATUS] = 'New'
+                src_query_group[DESCRIPTION] = ''
         else:
-            logger.debug('Query group not found in destination instance')
-            logger.debug('Setting query group package id to 0')
-            src_query_group[PACKAGE_ID] = 0
-            logger.debug('Setting status to "New"')
-            src_query_group[STATUS] = 'New'
-            # Set the LanguageStateDte to 0001-01-01T00:00:00 (as CxAudit does)
-            src_query_group[LANGUAGE_STATE_DATE] = datetime.datetime(1, 1, 1, 0, 0, 0)
-
-        if src_query_group[OWNING_TEAM] in team_map:
-            src_query_group[OWNING_TEAM] = team_map[src_query_group[OWNING_TEAM]]
-        src_query_group[DESCRIPTION] = ''
-        for src_query in src_query_group[QUERIES]:
-            logger.debug(f'Updating query: {src_query[NAME]}')
+            logger.debug(f'Updating query_group: {src_query_group[PACKAGE_FULL_NAME]}')
+            dst_query_group = find_query_group(src_query_group, dst_query_groups) #match this src query group to particular dst one
             if dst_query_group:
-                dst_query = find_query(src_query, dst_query_group)
+                logger.debug('Query group found in destination instance')
+                logger.debug(f'Setting query group package id to {dst_query_group[PACKAGE_ID]}')
+                src_query_group[PACKAGE_ID] = dst_query_group[PACKAGE_ID]
             else:
-                dst_query = None
-            if dst_query:
-                logger.debug('Query found in destination instance')
-                logger.debug(f'Setting query id to {dst_query[QUERY_ID]}')
-                src_query[QUERY_ID] = dst_query[QUERY_ID]
-                logger.debug(f'Setting query package id to {dst_query_group[PACKAGE_ID]}')
-                src_query[PACKAGE_ID] = dst_query_group[PACKAGE_ID]
-                logger.debug('Setting status to "Edited"')
-                src_query[STATUS] = 'Edited'
-            else:
-                logger.debug('Query not found in destination instance')
-                logger.debug('Setting query id to 0')
-                src_query[QUERY_ID] = 0
+                logger.debug('Query group not found in destination instance')
+                logger.debug('Setting query group package id to 0')
+                src_query_group[PACKAGE_ID] = 0
+                logger.debug('Setting status to "New"')
+                src_query_group[STATUS] = 'New'
+                # Set the LanguageStateDte to 0001-01-01T00:00:00 (as CxAudit does)
+                src_query_group[LANGUAGE_STATE_DATE] = datetime.datetime(1, 1, 1, 0, 0, 0)
+
+            if src_query_group[OWNING_TEAM] in team_map:
+                src_query_group[OWNING_TEAM] = team_map[src_query_group[OWNING_TEAM]]
+            src_query_group[DESCRIPTION] = ''
+            for src_query in src_query_group[QUERIES]:
+                logger.debug(f'Updating query: {src_query[NAME]}')
                 if dst_query_group:
+                    dst_query = find_query(src_query, dst_query_group)
+                else:
+                    dst_query = None
+                if dst_query:
+                    logger.debug('Query found in destination instance')
+                    logger.debug(f'Setting query id to {dst_query[QUERY_ID]}')
+                    src_query[QUERY_ID] = dst_query[QUERY_ID]
                     logger.debug(f'Setting query package id to {dst_query_group[PACKAGE_ID]}')
                     src_query[PACKAGE_ID] = dst_query_group[PACKAGE_ID]
+                    logger.debug('Setting status to "Edited"')
+                    src_query[STATUS] = 'Edited'
                 else:
-                    logger.debug('Setting query package id to -1')
-                    src_query[PACKAGE_ID] = -1
-                logger.debug(f'Setting query version code to 0')
-                src_query[QUERY_VERSION_CODE] = 0
-                logger.debug('Setting status to "New"')
-                src_query[STATUS] = 'New'
-            logger.debug('Setting type to "Draft"')
-            src_query[TYPE] = 'Draft'
+                    logger.debug('Query not found in destination instance')
+                    logger.debug('Setting query id to 0')
+                    src_query[QUERY_ID] = 0
+                    if dst_query_group:
+                        logger.debug(f'Setting query package id to {dst_query_group[PACKAGE_ID]}')
+                        src_query[PACKAGE_ID] = dst_query_group[PACKAGE_ID]
+                    else:
+                        logger.debug('Setting query package id to -1')
+                        src_query[PACKAGE_ID] = -1
+                    logger.debug(f'Setting query version code to 0')
+                    src_query[QUERY_VERSION_CODE] = 0
+                    logger.debug('Setting status to "New"')
+                    src_query[STATUS] = 'New'
+                logger.debug('Setting type to "Draft"')
+                src_query[TYPE] = 'Draft'
 
 
 def find_query_group(query_group, query_groups):
