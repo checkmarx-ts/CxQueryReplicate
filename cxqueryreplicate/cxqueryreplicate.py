@@ -16,7 +16,7 @@
 
 from CheckmarxPythonSDK.CxRestAPISDK import config as _global_config
 from CheckmarxPythonSDK.CxPortalSoapApiSDK import get_query_collection, upload_queries
-from CheckmarxPythonSDK.CxRestAPISDK import TeamAPI
+from CheckmarxPythonSDK.CxRestAPISDK import TeamAPI, ProjectsAPI
 from CheckmarxPythonSDK.CxRestAPISDK.team.dto import CxTeam
 
 import argparse
@@ -48,6 +48,9 @@ OWNING_TEAM = 'OwningTeam'
 PACKAGE_FULL_NAME = 'PackageFullName'
 PACKAGE_ID = 'PackageId'
 PACKAGE_TYPE = 'PackageType'
+PACKAGE_TYPE_NAME = 'PackageTypeName'
+PROJECT_ID = 'ProjectId'
+PROJECT = 'Project'
 QUERIES = 'Queries'
 QUERY_ID = 'QueryId'
 QUERY_GROUPS = 'QueryGroups'
@@ -102,6 +105,11 @@ def load_config(args):
     else:
         config[CFG_MAIN] = {}
         config[CFG_DESTINATION] = {}
+
+    config[CFG_MAIN][CFG_BASE_URL] = _global_config.config["base_url"]
+    config[CFG_MAIN][CFG_USERNAME] = _global_config.config["username"]
+    config[CFG_MAIN][CFG_PASSWORD] = _global_config.config["password"]
+    config[CFG_MAIN][CFG_SCOPE] = 'access_control_api sast_rest_api'
 
     # Allow command-line override
     if args.dst_base_url:
@@ -186,7 +194,7 @@ def replicate_queries(config, team_map):
 
     with ConfigOverride(config[CFG_DESTINATION]):
         dst_query_groups = retrieve_query_groups()
-        update_src_query_groups(src_query_groups, dst_query_groups, team_map)
+        update_src_query_groups(src_query_groups, dst_query_groups, team_map, config)
         if logger.getEffectiveLevel() == logging.DEBUG:
             pp = pprint.PrettyPrinter(indent=2)
             logger.debug(f'src_query_groups: {pp.pformat(src_query_groups)}')
@@ -216,72 +224,139 @@ def retrieve_query_groups():
 
     # For now, we only support replication of corporate and team custom queries
     query_groups = [qg for qg in query_groups
-                    if qg[PACKAGE_TYPE] in [CORPORATE, TEAM]]
+                    if qg[PACKAGE_TYPE] in [CORPORATE, TEAM, PROJECT]]
 
     return query_groups
 
+def find_project_names(query_group, query_groups, config):
+    """Find a query group in a list of query groups.
 
-def update_src_query_groups(src_query_groups, dst_query_groups, team_map):
+    Searches a list of query groups for a given query group, matching
+    on the fully qualified query group name. Returns the query group,
+    if found, or ``None``.
+
+    """
+    with ConfigOverride(config[CFG_MAIN]):
+        query_group_data = ProjectsAPI.get_project_details_by_id(query_group[PROJECT_ID])
+        for qg in query_groups:
+            with ConfigOverride(config[CFG_DESTINATION]):
+                qg_data = ProjectsAPI.get_project_details_by_id(qg[PROJECT_ID])
+                if query_group_data.name == qg_data.name:
+                    return qg
+
+    return None
+
+def find_destination_project(query_group, config):
+    """Find a query group in a list of query groups.
+
+    Searches a list of query groups for a given query group, matching
+    on the fully qualified query group name. Returns the query group,
+    if found, or ``None``.
+
+    """
+    with ConfigOverride(config[CFG_MAIN]):
+        query_group_data = ProjectsAPI.get_project_details_by_id(query_group[PROJECT_ID])
+        with ConfigOverride(config[CFG_DESTINATION]):
+            destination_projects = ProjectsAPI.get_all_project_details()
+            for project in destination_projects:
+                if query_group_data.name == project.name:
+                    return project
+
+    return None
+
+def update_src_query_groups(src_query_groups, dst_query_groups, team_map, config):
     """Update a list of query groups with information from the destination
 
     Given a list of query groups from a source CxSAST instance, update
-    each quey group, and the queries it contains, with appropriate
+    each query group, and the queries it contains, with appropriate
     values from either the corresponding query group in the
-    desitnation CxSAST instance or from the mapping of teams in the
+    destination CxSAST instance or from the mapping of teams in the
     source CxSASt instance to teams in the destination CxSAST
     instance.
 
     """
 
     for src_query_group in src_query_groups:
-        logger.debug(f'Updating query_group: {src_query_group[PACKAGE_FULL_NAME]}')
-        dst_query_group = find_query_group(src_query_group, dst_query_groups)
-        if dst_query_group:
-            logger.debug('Query group found in destination instance')
-            logger.debug(f'Setting query group package id to {dst_query_group[PACKAGE_ID]}')
-            src_query_group[PACKAGE_ID] = dst_query_group[PACKAGE_ID]
+        if src_query_group[PACKAGE_TYPE] == PROJECT:
+            dst_query_group_project = find_project_names(src_query_group, dst_query_groups, config)
+            if dst_query_group_project:
+                set_query_group_parameters(dst_query_group_project, src_query_group)
+            else:
+                set_query_group_parameters(config, src_query_group)
         else:
-            logger.debug('Query group not found in destination instance')
-            logger.debug('Setting query group package id to 0')
-            src_query_group[PACKAGE_ID] = 0
-            logger.debug('Setting status to "New"')
-            src_query_group[STATUS] = 'New'
-            # Set the LanguageStateDte to 0001-01-01T00:00:00 (as CxAudit does)
-            src_query_group[LANGUAGE_STATE_DATE] = datetime.datetime(1, 1, 1, 0, 0, 0)
-
-        if src_query_group[OWNING_TEAM] in team_map:
-            src_query_group[OWNING_TEAM] = team_map[src_query_group[OWNING_TEAM]]
-        src_query_group[DESCRIPTION] = ''
-        for src_query in src_query_group[QUERIES]:
-            logger.debug(f'Updating query: {src_query[NAME]}')
+            logger.debug(f'Updating query_group: {src_query_group[PACKAGE_FULL_NAME]}')
+            dst_query_group = find_query_group(src_query_group, dst_query_groups) #match this src query group to particular dst one
             if dst_query_group:
-                dst_query = find_query(src_query, dst_query_group)
+                logger.debug('Query group found in destination instance')
+                logger.debug(f'Setting query group package id to {dst_query_group[PACKAGE_ID]}')
+                src_query_group[PACKAGE_ID] = dst_query_group[PACKAGE_ID]
             else:
-                dst_query = None
-            if dst_query:
-                logger.debug('Query found in destination instance')
-                logger.debug(f'Setting query id to {dst_query[QUERY_ID]}')
-                src_query[QUERY_ID] = dst_query[QUERY_ID]
-                logger.debug(f'Setting query package id to {dst_query_group[PACKAGE_ID]}')
-                src_query[PACKAGE_ID] = dst_query_group[PACKAGE_ID]
-                logger.debug('Setting status to "Edited"')
-                src_query[STATUS] = 'Edited'
-            else:
-                logger.debug('Query not found in destination instance')
-                logger.debug('Setting query id to 0')
-                src_query[QUERY_ID] = 0
+                logger.debug('Query group not found in destination instance')
+                logger.debug('Setting query group package id to 0')
+                src_query_group[PACKAGE_ID] = 0
+                logger.debug('Setting status to "New"')
+                src_query_group[STATUS] = 'New'
+                # Set the LanguageStateDte to 0001-01-01T00:00:00 (as CxAudit does)
+                src_query_group[LANGUAGE_STATE_DATE] = datetime.datetime(1, 1, 1, 0, 0, 0)
+
+            if src_query_group[OWNING_TEAM] in team_map:
+                src_query_group[OWNING_TEAM] = team_map[src_query_group[OWNING_TEAM]]
+            src_query_group[DESCRIPTION] = ''
+            for src_query in src_query_group[QUERIES]:
+                logger.debug(f'Updating query: {src_query[NAME]}')
                 if dst_query_group:
+                    dst_query = find_query(src_query, dst_query_group)
+                else:
+                    dst_query = None
+                if dst_query:
+                    logger.debug('Query found in destination instance')
+                    logger.debug(f'Setting query id to {dst_query[QUERY_ID]}')
+                    src_query[QUERY_ID] = dst_query[QUERY_ID]
                     logger.debug(f'Setting query package id to {dst_query_group[PACKAGE_ID]}')
                     src_query[PACKAGE_ID] = dst_query_group[PACKAGE_ID]
+                    logger.debug('Setting status to "Edited"')
+                    src_query[STATUS] = 'Edited'
                 else:
-                    logger.debug('Setting query package id to -1')
-                    src_query[PACKAGE_ID] = -1
-                logger.debug(f'Setting query version code to 0')
-                src_query[QUERY_VERSION_CODE] = 0
-                logger.debug('Setting status to "New"')
-                src_query[STATUS] = 'New'
-            logger.debug('Setting type to "Draft"')
-            src_query[TYPE] = 'Draft'
+                    logger.debug('Query not found in destination instance')
+                    logger.debug('Setting query id to 0')
+                    src_query[QUERY_ID] = 0
+                    if dst_query_group:
+                        logger.debug(f'Setting query package id to {dst_query_group[PACKAGE_ID]}')
+                        src_query[PACKAGE_ID] = dst_query_group[PACKAGE_ID]
+                    else:
+                        logger.debug('Setting query package id to -1')
+                        src_query[PACKAGE_ID] = -1
+                    logger.debug(f'Setting query version code to 0')
+                    src_query[QUERY_VERSION_CODE] = 0
+                    logger.debug('Setting status to "New"')
+                    src_query[STATUS] = 'New'
+                logger.debug('Setting type to "Draft"')
+                src_query[TYPE] = 'Draft'
+
+
+def set_query_group_parameters(config, src_query_group):
+    logger.debug('Destination project does not have custom project queries')
+    dst_project = find_destination_project(src_query_group, config)
+    src_query_group[PROJECT_ID] = dst_project.project_id
+    src_query_group[PACKAGE_ID] = 0
+    src_query_group[PACKAGE_TYPE_NAME] = 'Package_' + str(dst_project.project_id)
+    package_name = src_query_group[PACKAGE_FULL_NAME].split(':')
+    src_query_group[PACKAGE_FULL_NAME] = package_name[0] + ':' + src_query_group[PACKAGE_TYPE_NAME] + ':' + \
+                                         package_name[2]
+    src_query_group[STATUS] = 'New'
+    src_query_group[DESCRIPTION] = ''
+
+
+def set_query_group_parameters(dst_query_group_project, src_query_group):
+    logger.debug('Destination project has custom project queries')
+    src_query_group[PROJECT_ID] = dst_query_group_project[PROJECT_ID]
+    src_query_group[PACKAGE_ID] = 0
+    src_query_group[PACKAGE_TYPE_NAME] = 'Package_' + str(src_query_group[PROJECT_ID])
+    package_name = src_query_group[PACKAGE_FULL_NAME].split(':')
+    src_query_group[PACKAGE_FULL_NAME] = package_name[0] + ':' + src_query_group[PACKAGE_TYPE_NAME] + ':' + \
+                                         package_name[2]
+    src_query_group[STATUS] = 'New'
+    src_query_group[DESCRIPTION] = ''
 
 
 def find_query_group(query_group, query_groups):
