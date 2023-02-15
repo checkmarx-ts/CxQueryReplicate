@@ -140,8 +140,8 @@ def replicate_teams(config):
     logger.debug('Starting')
 
     team_api = TeamAPI()
-    team_map = {} #create dictionary to hold map of teams
-    src_teams = {} #create dictionary to hold src team full name and team details
+    team_map = {}
+    src_teams = {}
     for team in team_api.get_all_teams():
         src_teams[team.full_name] = team
     logger.debug(f'Source teams: {src_teams}')
@@ -151,11 +151,11 @@ def replicate_teams(config):
         # Query twice to work around bug in SDK
         team_api.get_all_teams()
         for team in team_api.get_all_teams():
-            dst_teams[team.full_name] = team #create dictionary to hold dst team full name and team details
+            dst_teams[team.full_name] = team
         logger.debug(f'Destination teams: {dst_teams}')
 
         for team_full_name in sorted(src_teams):
-            if team_full_name not in dst_teams: #handle case where src team not in destination
+            if team_full_name not in dst_teams:
                 logger.debug(f'{team_full_name}: not in dst_teams')
                 parts = team_full_name.split('/')
                 team_name = parts[-1]
