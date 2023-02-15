@@ -165,14 +165,14 @@ def replicate_teams(config):
                 logger.debug(f'parent_team: {parent_team}')
                 if config[CFG_MAIN].getboolean(CFG_DRY_RUN):
                     logger.info(f'Dry run: {team_full_name}: would create team with name {team_name}')
-                else: #create team in destination environment if it does not exist yet
+                else:
                     parent_id = dst_teams[parent_team].team_id
                     logger.info(f'{team_full_name}: creating team with name {team_name} and parent {parent_id}')
-                    team_id = team_api.create_team(team_name, parent_id) #create team with src name and parent id
+                    team_id = team_api.create_team(team_name, parent_id)
                     logger.debug(f'Id of new team is {team_id}')
-                    dst_teams[team_full_name] = CxTeam(team_id, team_name, team_full_name, parent_id) #insert into list after creation
+                    dst_teams[team_full_name] = CxTeam(team_id, team_name, team_full_name, parent_id)
 
-            if not config[CFG_MAIN].getboolean(CFG_DRY_RUN): #set team id in source to team id from destination
+            if not config[CFG_MAIN].getboolean(CFG_DRY_RUN):
                 team_map[src_teams[team_full_name].team_id] = dst_teams[team_full_name].team_id
 
     logger.info('Teams replicated successfully')
@@ -181,7 +181,7 @@ def replicate_teams(config):
     return team_map
 
 
-def replicate_queries(config, team_map): #base method
+def replicate_queries(config, team_map):
     """Replicate custom queries from one CxSAST instance to another."""
     logger.debug('Starting')
 
@@ -191,15 +191,15 @@ def replicate_queries(config, team_map): #base method
         return 0
 
     with ConfigOverride(config[CFG_DESTINATION]):
-        dst_query_groups = retrieve_query_groups() #handles api call from python SDK and filters results
-        update_src_query_groups(src_query_groups, dst_query_groups, team_map) #handles mapping of queries between src and dest
+        dst_query_groups = retrieve_query_groups()
+        update_src_query_groups(src_query_groups, dst_query_groups, team_map)
         if logger.getEffectiveLevel() == logging.DEBUG:
             pp = pprint.PrettyPrinter(indent=2)
             logger.debug(f'src_query_groups: {pp.pformat(src_query_groups)}')
         if config[CFG_MAIN].getboolean(CFG_DRY_RUN):
             logger.debug('Dry run: not uploading queries')
             return 0
-        resp = upload_queries(src_query_groups) #updates from list of queries using SOAP endpoint
+        resp = upload_queries(src_query_groups)
         if resp[IS_SUCCESSFUL]:
             logger.info('Queries loaded successfully')
         else:
@@ -221,7 +221,7 @@ def retrieve_query_groups():
     query_groups = resp[QUERY_GROUPS]
 
     # For now, we only support replication of corporate and team custom queries
-    query_groups = [qg for qg in query_groups #keeping so that toggle for each query level can be implemented later
+    query_groups = [qg for qg in query_groups
                     if qg[PACKAGE_TYPE] in [CORPORATE, TEAM, PROJECT]]
 
     return query_groups
