@@ -280,24 +280,9 @@ def update_src_query_groups(src_query_groups, dst_query_groups, team_map, config
         if src_query_group[PACKAGE_TYPE] == PROJECT:
             dst_query_group_project = find_project_names(src_query_group, dst_query_groups, config)
             if dst_query_group_project:
-                logger.debug('Destination project has custom project queries')
-                src_query_group[PROJECT_ID] = dst_query_group_project[PROJECT_ID]
-                src_query_group[PACKAGE_ID] = 0
-                src_query_group[PACKAGE_TYPE_NAME] = 'Package_' + str(src_query_group[PROJECT_ID])
-                package_name = src_query_group[PACKAGE_FULL_NAME].split(':')
-                src_query_group[PACKAGE_FULL_NAME] = package_name[0] + ':' + src_query_group[PACKAGE_TYPE_NAME] + ':' + package_name[2]
-                src_query_group[STATUS] = 'New'
-                src_query_group[DESCRIPTION] = ''
+                set_query_group_parameters(dst_query_group_project, src_query_group)
             else:
-                logger.debug('Destination project does not have custom project queries')
-                dst_project = find_destination_project(src_query_group, config)
-                src_query_group[PROJECT_ID] = dst_project.project_id
-                src_query_group[PACKAGE_ID] = 0
-                src_query_group[PACKAGE_TYPE_NAME] = 'Package_' + str(dst_project.project_id)
-                package_name = src_query_group[PACKAGE_FULL_NAME].split(':')
-                src_query_group[PACKAGE_FULL_NAME] = package_name[0] + ':' + src_query_group[PACKAGE_TYPE_NAME] + ':' + package_name[2]
-                src_query_group[STATUS] = 'New'
-                src_query_group[DESCRIPTION] = ''
+                set_query_group_parameters(config, src_query_group)
         else:
             logger.debug(f'Updating query_group: {src_query_group[PACKAGE_FULL_NAME]}')
             dst_query_group = find_query_group(src_query_group, dst_query_groups) #match this src query group to particular dst one
@@ -347,6 +332,31 @@ def update_src_query_groups(src_query_groups, dst_query_groups, team_map, config
                     src_query[STATUS] = 'New'
                 logger.debug('Setting type to "Draft"')
                 src_query[TYPE] = 'Draft'
+
+
+def set_query_group_parameters(config, src_query_group):
+    logger.debug('Destination project does not have custom project queries')
+    dst_project = find_destination_project(src_query_group, config)
+    src_query_group[PROJECT_ID] = dst_project.project_id
+    src_query_group[PACKAGE_ID] = 0
+    src_query_group[PACKAGE_TYPE_NAME] = 'Package_' + str(dst_project.project_id)
+    package_name = src_query_group[PACKAGE_FULL_NAME].split(':')
+    src_query_group[PACKAGE_FULL_NAME] = package_name[0] + ':' + src_query_group[PACKAGE_TYPE_NAME] + ':' + \
+                                         package_name[2]
+    src_query_group[STATUS] = 'New'
+    src_query_group[DESCRIPTION] = ''
+
+
+def set_query_group_parameters(dst_query_group_project, src_query_group):
+    logger.debug('Destination project has custom project queries')
+    src_query_group[PROJECT_ID] = dst_query_group_project[PROJECT_ID]
+    src_query_group[PACKAGE_ID] = 0
+    src_query_group[PACKAGE_TYPE_NAME] = 'Package_' + str(src_query_group[PROJECT_ID])
+    package_name = src_query_group[PACKAGE_FULL_NAME].split(':')
+    src_query_group[PACKAGE_FULL_NAME] = package_name[0] + ':' + src_query_group[PACKAGE_TYPE_NAME] + ':' + \
+                                         package_name[2]
+    src_query_group[STATUS] = 'New'
+    src_query_group[DESCRIPTION] = ''
 
 
 def find_query_group(query_group, query_groups):
