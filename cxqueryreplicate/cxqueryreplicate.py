@@ -16,7 +16,7 @@
 
 from CheckmarxPythonSDK.CxRestAPISDK import config as _global_config
 from CheckmarxPythonSDK.CxPortalSoapApiSDK import get_query_collection, upload_queries
-from CheckmarxPythonSDK.CxRestAPISDK import TeamAPI
+from CheckmarxPythonSDK.CxRestAPISDK import TeamAPI, ProjectsAPI
 from CheckmarxPythonSDK.CxRestAPISDK.team.dto import CxTeam
 
 import argparse
@@ -48,6 +48,7 @@ OWNING_TEAM = 'OwningTeam'
 PACKAGE_FULL_NAME = 'PackageFullName'
 PACKAGE_ID = 'PackageId'
 PACKAGE_TYPE = 'PackageType'
+PROJECT = 'Project'
 QUERIES = 'Queries'
 QUERY_ID = 'QueryId'
 QUERY_GROUPS = 'QueryGroups'
@@ -103,6 +104,11 @@ def load_config(args):
         config[CFG_MAIN] = {}
         config[CFG_DESTINATION] = {}
 
+    config[CFG_MAIN][CFG_BASE_URL] = _global_config.config["base_url"]
+    config[CFG_MAIN][CFG_USERNAME] = _global_config.config["username"]
+    config[CFG_MAIN][CFG_PASSWORD] = _global_config.config["password"]
+    config[CFG_MAIN][CFG_SCOPE] = 'access_control_api sast_rest_api'
+
     # Allow command-line override
     if args.dst_base_url:
         config[CFG_DESTINATION][CFG_BASE_URL] = args.dst_base_url
@@ -134,8 +140,8 @@ def replicate_teams(config):
     logger.debug('Starting')
 
     team_api = TeamAPI()
-    team_map = {}
-    src_teams = {}
+    team_map = {} #create dictionary to hold map of teams
+    src_teams = {} #create dictionary to hold src team full name and team details
     for team in team_api.get_all_teams():
         src_teams[team.full_name] = team
     logger.debug(f'Source teams: {src_teams}')
@@ -145,11 +151,11 @@ def replicate_teams(config):
         # Query twice to work around bug in SDK
         team_api.get_all_teams()
         for team in team_api.get_all_teams():
-            dst_teams[team.full_name] = team
+            dst_teams[team.full_name] = team #create dictionary to hold dst team full name and team details
         logger.debug(f'Destination teams: {dst_teams}')
 
         for team_full_name in sorted(src_teams):
-            if team_full_name not in dst_teams:
+            if team_full_name not in dst_teams: #handle case where src team not in destination
                 logger.debug(f'{team_full_name}: not in dst_teams')
                 parts = team_full_name.split('/')
                 team_name = parts[-1]
@@ -159,14 +165,14 @@ def replicate_teams(config):
                 logger.debug(f'parent_team: {parent_team}')
                 if config[CFG_MAIN].getboolean(CFG_DRY_RUN):
                     logger.info(f'Dry run: {team_full_name}: would create team with name {team_name}')
-                else:
+                else: #create team in destination environment if it does not exist yet
                     parent_id = dst_teams[parent_team].team_id
                     logger.info(f'{team_full_name}: creating team with name {team_name} and parent {parent_id}')
-                    team_id = team_api.create_team(team_name, parent_id)
+                    team_id = team_api.create_team(team_name, parent_id) #create team with src name and parent id
                     logger.debug(f'Id of new team is {team_id}')
-                    dst_teams[team_full_name] = CxTeam(team_id, team_name, team_full_name, parent_id)
+                    dst_teams[team_full_name] = CxTeam(team_id, team_name, team_full_name, parent_id) #insert into list after creation
 
-            if not config[CFG_MAIN].getboolean(CFG_DRY_RUN):
+            if not config[CFG_MAIN].getboolean(CFG_DRY_RUN): #set team id in source to team id from destination
                 team_map[src_teams[team_full_name].team_id] = dst_teams[team_full_name].team_id
 
     logger.info('Teams replicated successfully')
@@ -220,6 +226,41 @@ def retrieve_query_groups():
 
     return query_groups
 
+def find_project_names(query_group, query_groups, config):
+    """Find a query group in a list of query groups.
+
+    Searches a list of query groups for a given query group, matching
+    on the fully qualified query group name. Returns the query group,
+    if found, or ``None``.
+
+    """
+    with ConfigOverride(config[CFG_MAIN]):
+        query_group_data = ProjectsAPI.get_project_details_by_id(query_group['ProjectId'])
+        for qg in query_groups:
+            with ConfigOverride(config[CFG_DESTINATION]):
+                qg_data = ProjectsAPI.get_project_details_by_id(qg['ProjectId'])
+                if query_group_data.name == qg_data.name:
+                    return qg
+
+    return None
+
+def find_destination_project(query_group, config):
+    """Find a query group in a list of query groups.
+
+    Searches a list of query groups for a given query group, matching
+    on the fully qualified query group name. Returns the query group,
+    if found, or ``None``.
+
+    """
+    with ConfigOverride(config[CFG_MAIN]):
+        query_group_data = ProjectsAPI.get_project_details_by_id(query_group['ProjectId'])
+        with ConfigOverride(config[CFG_DESTINATION]):
+            destination_projects = ProjectsAPI.get_all_project_details()
+            for project in destination_projects:
+                if query_group_data.name == project.name:
+                    return project
+
+    return None
 
 def update_src_query_groups(src_query_groups, dst_query_groups, team_map):
     """Update a list of query groups with information from the destination
@@ -235,7 +276,7 @@ def update_src_query_groups(src_query_groups, dst_query_groups, team_map):
 
     for src_query_group in src_query_groups:
         logger.debug(f'Updating query_group: {src_query_group[PACKAGE_FULL_NAME]}')
-        dst_query_group = find_query_group(src_query_group, dst_query_groups)
+        dst_query_group = find_query_group(src_query_group, dst_query_groups) #match this src query group to particular dst one
         if dst_query_group:
             logger.debug('Query group found in destination instance')
             logger.debug(f'Setting query group package id to {dst_query_group[PACKAGE_ID]}')
