@@ -28,8 +28,6 @@ import os.path
 import pprint
 import sys
 
-PROJECT_ID = 'ProjectId'
-
 # Constants
 CFG_BASE_URL = 'base_url'
 CFG_DESTINATION = 'destination'
@@ -50,7 +48,6 @@ OWNING_TEAM = 'OwningTeam'
 PACKAGE_FULL_NAME = 'PackageFullName'
 PACKAGE_ID = 'PackageId'
 PACKAGE_TYPE = 'PackageType'
-PACKAGE_FULL_NAME = 'PackageFullName'
 PACKAGE_TYPE_NAME = 'PackageTypeName'
 PROJECT_ID = 'ProjectId'
 PROJECT = 'Project'
