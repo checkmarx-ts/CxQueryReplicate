@@ -194,7 +194,7 @@ def replicate_queries(config, team_map):
 
     with ConfigOverride(config[CFG_DESTINATION]):
         dst_query_groups = retrieve_query_groups()
-        update_src_query_groups(src_query_groups, dst_query_groups, team_map)
+        update_src_query_groups(src_query_groups, dst_query_groups, team_map, config)
         if logger.getEffectiveLevel() == logging.DEBUG:
             pp = pprint.PrettyPrinter(indent=2)
             logger.debug(f'src_query_groups: {pp.pformat(src_query_groups)}')
@@ -264,7 +264,7 @@ def find_destination_project(query_group, config):
 
     return None
 
-def update_src_query_groups(src_query_groups, dst_query_groups, team_map):
+def update_src_query_groups(src_query_groups, dst_query_groups, team_map, config):
     """Update a list of query groups with information from the destination
 
     Given a list of query groups from a source CxSAST instance, update
