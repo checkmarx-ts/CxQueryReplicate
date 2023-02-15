@@ -28,6 +28,8 @@ import os.path
 import pprint
 import sys
 
+PROJECT_ID = 'ProjectId'
+
 # Constants
 CFG_BASE_URL = 'base_url'
 CFG_DESTINATION = 'destination'
@@ -48,6 +50,9 @@ OWNING_TEAM = 'OwningTeam'
 PACKAGE_FULL_NAME = 'PackageFullName'
 PACKAGE_ID = 'PackageId'
 PACKAGE_TYPE = 'PackageType'
+PACKAGE_FULL_NAME = 'PackageFullName'
+PACKAGE_TYPE_NAME = 'PackageTypeName'
+PROJECT_ID = 'ProjectId'
 PROJECT = 'Project'
 QUERIES = 'Queries'
 QUERY_ID = 'QueryId'
@@ -235,10 +240,10 @@ def find_project_names(query_group, query_groups, config):
 
     """
     with ConfigOverride(config[CFG_MAIN]):
-        query_group_data = ProjectsAPI.get_project_details_by_id(query_group['ProjectId'])
+        query_group_data = ProjectsAPI.get_project_details_by_id(query_group[PROJECT_ID])
         for qg in query_groups:
             with ConfigOverride(config[CFG_DESTINATION]):
-                qg_data = ProjectsAPI.get_project_details_by_id(qg['ProjectId'])
+                qg_data = ProjectsAPI.get_project_details_by_id(qg[PROJECT_ID])
                 if query_group_data.name == qg_data.name:
                     return qg
 
@@ -253,7 +258,7 @@ def find_destination_project(query_group, config):
 
     """
     with ConfigOverride(config[CFG_MAIN]):
-        query_group_data = ProjectsAPI.get_project_details_by_id(query_group['ProjectId'])
+        query_group_data = ProjectsAPI.get_project_details_by_id(query_group[PROJECT_ID])
         with ConfigOverride(config[CFG_DESTINATION]):
             destination_projects = ProjectsAPI.get_all_project_details()
             for project in destination_projects:
@@ -279,21 +284,21 @@ def update_src_query_groups(src_query_groups, dst_query_groups, team_map):
             dst_query_group_project = find_project_names(src_query_group, dst_query_groups, config)
             if dst_query_group_project:
                 logger.debug('Destination project has custom project queries')
-                src_query_group['ProjectId'] = dst_query_group_project['ProjectId']
+                src_query_group[PROJECT_ID] = dst_query_group_project[PROJECT_ID]
                 src_query_group[PACKAGE_ID] = 0
-                src_query_group['PackageTypeName'] = 'Package_' + str(src_query_group['ProjectId'])
-                package_name = src_query_group['PackageFullName'].split(':')
-                src_query_group['PackageFullName'] = package_name[0] + ':' + src_query_group['PackageTypeName'] + ':' + package_name[2]
+                src_query_group[PACKAGE_TYPE_NAME] = 'Package_' + str(src_query_group[PROJECT_ID])
+                package_name = src_query_group[PACKAGE_FULL_NAME].split(':')
+                src_query_group[PACKAGE_FULL_NAME] = package_name[0] + ':' + src_query_group[PACKAGE_TYPE_NAME] + ':' + package_name[2]
                 src_query_group[STATUS] = 'New'
                 src_query_group[DESCRIPTION] = ''
             else:
                 logger.debug('Destination project does not have custom project queries')
                 dst_project = find_destination_project(src_query_group, config)
-                src_query_group['ProjectId'] = dst_project.project_id
+                src_query_group[PROJECT_ID] = dst_project.project_id
                 src_query_group[PACKAGE_ID] = 0
-                src_query_group['PackageTypeName'] = 'Package_' + str(dst_project.project_id)
-                package_name = src_query_group['PackageFullName'].split(':')
-                src_query_group['PackageFullName'] = package_name[0] + ':' + src_query_group['PackageTypeName'] + ':' + package_name[2]
+                src_query_group[PACKAGE_TYPE_NAME] = 'Package_' + str(dst_project.project_id)
+                package_name = src_query_group[PACKAGE_FULL_NAME].split(':')
+                src_query_group[PACKAGE_FULL_NAME] = package_name[0] + ':' + src_query_group[PACKAGE_TYPE_NAME] + ':' + package_name[2]
                 src_query_group[STATUS] = 'New'
                 src_query_group[DESCRIPTION] = ''
         else:
