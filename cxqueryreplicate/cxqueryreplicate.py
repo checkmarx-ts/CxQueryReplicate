@@ -41,7 +41,7 @@ CORPORATE = 'Corporate'
 DESCRIPTION = 'Description'
 ERROR_MESSAGE = 'ErrorMessage'
 IS_SUCCESSFUL = 'IsSuccesfull'
-LANGUAGE_STATE_DATE= 'LanguageStateDate'
+LANGUAGE_STATE_DATE = 'LanguageStateDate'
 LOG_FORMAT = '%(asctime)s | %(levelname)8s | %(funcName)25s | %(message)s'
 NAME = 'Name'
 OWNING_TEAM = 'OwningTeam'
@@ -183,17 +183,17 @@ def replicate_teams(config):
     return team_map
 
 
-def replicate_queries(config, team_map):
+def replicate_queries(config, team_map, args):
     """Replicate custom queries from one CxSAST instance to another."""
     logger.debug('Starting')
 
-    src_query_groups = retrieve_query_groups()
+    src_query_groups = retrieve_query_groups(args)
     if not src_query_groups:
         logger.info('No source queries found.')
         return 0
 
     with ConfigOverride(config[CFG_DESTINATION]):
-        dst_query_groups = retrieve_query_groups()
+        dst_query_groups = retrieve_query_groups(args)
         update_src_query_groups(src_query_groups, dst_query_groups, team_map, config)
         if logger.getEffectiveLevel() == logging.DEBUG:
             pp = pprint.PrettyPrinter(indent=2)
@@ -209,11 +209,11 @@ def replicate_queries(config, team_map):
 
         # Re-retrieve the destination query groups to validate that
         # the upload has really been successful.
-        dst_query_groups = retrieve_query_groups()
+        dst_query_groups = retrieve_query_groups(args)
         return validate_query_groups(src_query_groups, dst_query_groups)
 
 
-def retrieve_query_groups():
+def retrieve_query_groups(args):
     """Retrieve custom queries from the current CxSAST instance."""
     logger.debug(f'Retrieving queries from {_global_config.config[CFG_BASE_URL]}')
     resp = get_query_collection()
@@ -222,11 +222,17 @@ def retrieve_query_groups():
 
     query_groups = resp[QUERY_GROUPS]
 
-    # For now, we only support replication of corporate and team custom queries
+    query_groups_levels = []
+    query_groups_dict = {'corp': CORPORATE, 'team': TEAM, 'project': PROJECT}
+
+    for level in args.query_levels:
+        query_groups_levels.append(query_groups_dict[level])
+
     query_groups = [qg for qg in query_groups
-                    if qg[PACKAGE_TYPE] in [CORPORATE, TEAM, PROJECT]]
+                    if qg[PACKAGE_TYPE] in query_groups_levels]
 
     return query_groups
+
 
 def find_project_names(query_group, query_groups, config):
     """Find a query group in a list of query groups.
@@ -240,11 +246,13 @@ def find_project_names(query_group, query_groups, config):
         query_group_data = ProjectsAPI.get_project_details_by_id(query_group[PROJECT_ID])
         for qg in query_groups:
             with ConfigOverride(config[CFG_DESTINATION]):
-                qg_data = ProjectsAPI.get_project_details_by_id(qg[PROJECT_ID])
-                if query_group_data.name == qg_data.name:
-                    return qg
+                if qg['PackageType'] == 'Project':
+                    qg_data = ProjectsAPI.get_project_details_by_id(qg[PROJECT_ID])
+                    if query_group_data.name == qg_data.name:
+                        return qg
 
     return None
+
 
 def find_destination_project(query_group, config):
     """Find a query group in a list of query groups.
@@ -263,6 +271,7 @@ def find_destination_project(query_group, config):
                     return project
 
     return None
+
 
 def update_src_query_groups(src_query_groups, dst_query_groups, team_map, config):
     """Update a list of query groups with information from the destination
@@ -285,7 +294,8 @@ def update_src_query_groups(src_query_groups, dst_query_groups, team_map, config
                 set_query_group_parameters(config, src_query_group)
         else:
             logger.debug(f'Updating query_group: {src_query_group[PACKAGE_FULL_NAME]}')
-            dst_query_group = find_query_group(src_query_group, dst_query_groups) #match this src query group to particular dst one
+            dst_query_group = find_query_group(src_query_group,
+                                               dst_query_groups)  # match this src query group to particular dst one
             if dst_query_group:
                 logger.debug('Query group found in destination instance')
                 logger.debug(f'Setting query group package id to {dst_query_group[PACKAGE_ID]}')
@@ -339,7 +349,7 @@ def set_query_group_parameters(config, src_query_group):
     dst_project = find_destination_project(src_query_group, config)
     src_query_group[PROJECT_ID] = dst_project.project_id
     src_query_group[PACKAGE_ID] = 0
-    src_query_group[PACKAGE_TYPE_NAME] = 'Package_' + str(dst_project.project_id)
+    src_query_group[PACKAGE_TYPE_NAME] = 'CxProject_' + str(dst_project.project_id)
     package_name = src_query_group[PACKAGE_FULL_NAME].split(':')
     src_query_group[PACKAGE_FULL_NAME] = package_name[0] + ':' + src_query_group[PACKAGE_TYPE_NAME] + ':' + \
                                          package_name[2]
@@ -351,7 +361,7 @@ def set_query_group_parameters(dst_query_group_project, src_query_group):
     logger.debug('Destination project has custom project queries')
     src_query_group[PROJECT_ID] = dst_query_group_project[PROJECT_ID]
     src_query_group[PACKAGE_ID] = 0
-    src_query_group[PACKAGE_TYPE_NAME] = 'Package_' + str(src_query_group[PROJECT_ID])
+    src_query_group[PACKAGE_TYPE_NAME] = 'CxProject_' + str(src_query_group[PROJECT_ID])
     package_name = src_query_group[PACKAGE_FULL_NAME].split(':')
     src_query_group[PACKAGE_FULL_NAME] = package_name[0] + ':' + src_query_group[PACKAGE_TYPE_NAME] + ':' + \
                                          package_name[2]
@@ -370,7 +380,7 @@ def find_query_group(query_group, query_groups):
 
     for qg in query_groups:
         if query_group[PACKAGE_FULL_NAME] == qg[PACKAGE_FULL_NAME] and \
-           query_group[OWNING_TEAM] == qg[OWNING_TEAM]:
+                query_group[OWNING_TEAM] == qg[OWNING_TEAM]:
             return qg
 
     return None
@@ -443,16 +453,16 @@ def setup_logger(logger_name, log_level):
     logger.addHandler(handler)
 
 
-def replicate_teams_and_queries(config):
+def replicate_teams_and_queries(config, args):
     team_map = replicate_teams(config)
-    status = replicate_queries(config, team_map)
+    status = replicate_queries(config, team_map, args)
     return status
+
 
 # Main entry point
 
 
 def main():
-
     parser = argparse.ArgumentParser(description='Replicate CxSAST custom queries')
     parser.add_argument('--config_file', metavar='FILE',
                         help='The configuration file')
@@ -466,6 +476,8 @@ def main():
                         help='The log level')
     parser.add_argument('--dry_run', action='store_true', default=False,
                         help='Dry run')
+    parser.add_argument('--query_levels', nargs='+', default='corp',
+                        help='The query levels to be migrated')
 
     args = parser.parse_args()
 
@@ -473,7 +485,7 @@ def main():
     try:
         logger.info('Starting')
         config = load_config(args)
-        status = replicate_teams_and_queries(config)
+        status = replicate_teams_and_queries(config, args)
         logger.info(f'Completed with exit status {status}')
         sys.exit(status)
     except Exception as e:
@@ -482,5 +494,4 @@ def main():
 
 
 if __name__ == '__main__':
-
     main()
