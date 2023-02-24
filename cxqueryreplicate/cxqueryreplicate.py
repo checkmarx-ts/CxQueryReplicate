@@ -234,17 +234,17 @@ def retrieve_query_groups(args):
     return query_groups
 
 
-def find_project_names(query_group, query_groups, config):
-    """Find a query group in a list of query groups.
+def find_project_names(src_query_group, dst_query_groups, config):
+    """Perform a search to see if the project name of the source query exists in the destination instance
 
-    Searches a list of query groups for a given query group, matching
-    on the fully qualified query group name. Returns the query group,
-    if found, or ``None``.
+    An API call to the source instance is called using source query group which contains a project ID.  This name is
+    then matched to a call to the destination instance using the destination query groups, which contains a project ID.
+    If no names in the destination match the source query, none is returned.
 
     """
     with ConfigOverride(config[CFG_MAIN]):
-        query_group_data = ProjectsAPI.get_project_details_by_id(query_group[PROJECT_ID])
-        for qg in query_groups:
+        query_group_data = ProjectsAPI.get_project_details_by_id(src_query_group[PROJECT_ID])
+        for qg in dst_query_groups:
             with ConfigOverride(config[CFG_DESTINATION]):
                 if qg['PackageType'] == 'Project':
                     qg_data = ProjectsAPI.get_project_details_by_id(qg[PROJECT_ID])
@@ -254,16 +254,17 @@ def find_project_names(query_group, query_groups, config):
     return None
 
 
-def find_destination_project(query_group, config):
-    """Find a query group in a list of query groups.
+def find_destination_project(src_query_group, config):
+    """Find the project details in the destination
 
-    Searches a list of query groups for a given query group, matching
-    on the fully qualified query group name. Returns the query group,
-    if found, or ``None``.
+    An API call to the source instance is called using source query group which contains a project ID.  This name is
+    then matched to a call to the destination instance to retrieve all project details.  The project details with a
+    name matching that of the source query is then returned.  If no names in the destination match the source query,
+    none is returned.
 
     """
     with ConfigOverride(config[CFG_MAIN]):
-        query_group_data = ProjectsAPI.get_project_details_by_id(query_group[PROJECT_ID])
+        query_group_data = ProjectsAPI.get_project_details_by_id(src_query_group[PROJECT_ID])
         with ConfigOverride(config[CFG_DESTINATION]):
             destination_projects = ProjectsAPI.get_all_project_details()
             for project in destination_projects:
@@ -345,6 +346,11 @@ def update_src_query_groups(src_query_groups, dst_query_groups, team_map, config
 
 
 def set_query_group_parameters(config, src_query_group):
+    """Sets the parameters of the src_query_group, which will be written to the destination
+
+    This scenario is if the project in the destination instance does not contain any custom queries yet, but
+    the same project in the source destination has custom queries.
+    """
     logger.debug('Destination project does not have custom project queries')
     dst_project = find_destination_project(src_query_group, config)
     src_query_group[PROJECT_ID] = dst_project.project_id
@@ -358,6 +364,12 @@ def set_query_group_parameters(config, src_query_group):
 
 
 def set_query_group_parameters(dst_query_group_project, src_query_group):
+    """Sets the parameters of the src_query_group, which will be written to the destination
+
+    This scenario is if the project in the destination instance has custom queries, and
+    the same project in the source destination has custom queries.
+    """
+
     logger.debug('Destination project has custom project queries')
     src_query_group[PROJECT_ID] = dst_query_group_project[PROJECT_ID]
     src_query_group[PACKAGE_ID] = 0
