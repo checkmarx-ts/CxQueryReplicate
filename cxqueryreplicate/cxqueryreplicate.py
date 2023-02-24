@@ -254,26 +254,6 @@ def find_project_names(src_query_group, dst_query_groups, config):
     return None
 
 
-def find_destination_project(src_query_group, config):
-    """Find the project details in the destination
-
-    An API call to the source instance is called using source query group which contains a project ID.  This name is
-    then matched to a call to the destination instance to retrieve all project details.  The project details with a
-    name matching that of the source query is then returned.  If no names in the destination match the source query,
-    none is returned.
-
-    """
-    with ConfigOverride(config[CFG_MAIN]):
-        query_group_data = ProjectsAPI.get_project_details_by_id(src_query_group[PROJECT_ID])
-        with ConfigOverride(config[CFG_DESTINATION]):
-            destination_projects = ProjectsAPI.get_all_project_details()
-            for project in destination_projects:
-                if query_group_data.name == project.name:
-                    return project
-
-    return None
-
-
 def update_src_query_groups(src_query_groups, dst_query_groups, team_map, config):
     """Update a list of query groups with information from the destination
 
@@ -343,6 +323,26 @@ def update_src_query_groups(src_query_groups, dst_query_groups, team_map, config
                     src_query[STATUS] = 'New'
                 logger.debug('Setting type to "Draft"')
                 src_query[TYPE] = 'Draft'
+
+
+def find_destination_project(src_query_group, config):
+    """Find the project details in the destination
+
+    An API call to the source instance is called using source query group which contains a project ID.  This name is
+    then matched to a call to the destination instance to retrieve all project details.  The project details with a
+    name matching that of the source query is then returned.  If no names in the destination match the source query,
+    none is returned.
+
+    """
+    with ConfigOverride(config[CFG_MAIN]):
+        query_group_data = ProjectsAPI.get_project_details_by_id(src_query_group[PROJECT_ID])
+        with ConfigOverride(config[CFG_DESTINATION]):
+            destination_projects = ProjectsAPI.get_all_project_details()
+            for project in destination_projects:
+                if query_group_data.name == project.name:
+                    return project
+
+    return None
 
 
 def set_query_group_parameters(config, src_query_group):
