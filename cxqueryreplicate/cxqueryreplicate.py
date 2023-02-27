@@ -194,7 +194,7 @@ def replicate_queries(config, team_map, args):
 
     with ConfigOverride(config[CFG_DESTINATION]):
         dst_query_groups = retrieve_query_groups(args)
-        update_src_query_groups(src_query_groups, dst_query_groups, team_map, config)
+        update_src_query_groups(src_query_groups, dst_query_groups, team_map, config, args.override_project_queries)
         if logger.getEffectiveLevel() == logging.DEBUG:
             pp = pprint.PrettyPrinter(indent=2)
             logger.debug(f'src_query_groups: {pp.pformat(src_query_groups)}')
@@ -256,7 +256,7 @@ def find_project_names(src_query_group, dst_query_groups, config):
 
     return query_group_list
 
-def update_src_query_groups(src_query_groups, dst_query_groups, team_map, config):
+def update_src_query_groups(src_query_groups, dst_query_groups, team_map, config, isOverrideProjectQueries):
     """Update a list of query groups with information from the destination
 
     Given a list of query groups from a source CxSAST instance, update
@@ -272,7 +272,7 @@ def update_src_query_groups(src_query_groups, dst_query_groups, team_map, config
         if src_query_group[PACKAGE_TYPE] == PROJECT:
             dst_query_group_projects = find_project_names(src_query_group, dst_query_groups, config) #needs to be a list
             if dst_query_group_projects:
-                set_query_group_parameters(dst_query_group_projects, src_query_group)
+                set_query_group_parameters(dst_query_group_projects, src_query_group, isOverrideProjectQueries)
             else:
                 set_query_group_parameters(config, src_query_group)
         else:
@@ -365,21 +365,21 @@ def set_query_group_parameters(config, src_query_group):
     src_query_group[DESCRIPTION] = ''
 
 
-def set_query_group_parameters(dst_query_group_projects, src_query_group):
+def set_query_group_parameters(dst_query_group_projects, src_query_group, isOverrideProjectQueries):
     """Sets the parameters of the src_query_group, which will be written to the destination
 
     This scenario is if the project in the destination instance has custom queries, and
     the same project in the source destination has custom queries.
     """
+    if isOverrideProjectQueries:
+        for src_query in src_query_group['Queries']:
+            for query_group in dst_query_group_projects:
+                for dst_query in query_group['Queries']: #is a list, the for each is same as using index like [0]
+                    if dst_query['Cwe'] == src_query['Cwe'] and dst_query['QueryId'] == src_query['QueryId'] and dst_query['Name'] == src_query['Name']:
+                        src_query['Status'] = 'Pending Delete'
 
-    for src_query in src_query_group['Queries']:
-        for query_group in dst_query_group_projects:
-            for dst_query in query_group['Queries']: #is a list, the for each is same as using index like [0]
-                if dst_query['Cwe'] == src_query['Cwe'] and dst_query['QueryId'] == src_query['QueryId'] and dst_query['Name'] == src_query['Name']:
-                    src_query['Status'] = 'Pending Delete'
-
-    src_queries_filtered = [item for item in src_query_group['Queries'] if item.get('Status') != 'Pending Delete']
-    src_query_group['Queries'] = src_queries_filtered
+        src_queries_filtered = [item for item in src_query_group['Queries'] if item.get('Status') != 'Pending Delete']
+        src_query_group['Queries'] = src_queries_filtered
 
     logger.debug('Destination project has custom project queries')
     src_query_group[PROJECT_ID] = dst_query_group_projects[0][PROJECT_ID]
@@ -499,8 +499,10 @@ def main():
                         help='The log level')
     parser.add_argument('--dry_run', action='store_true', default=False,
                         help='Dry run')
-    parser.add_argument('--query_levels', nargs='+', default=['corp'],
+    parser.add_argument('--query_levels', nargs='+', default=['corp', 'team'],
                         help='The query levels to be migrated')
+    parser.add_argument('--override_project_queries', default=False,
+                        help='If a query is present on both the source and destination, override the destination query')
 
     args = parser.parse_args()
 
