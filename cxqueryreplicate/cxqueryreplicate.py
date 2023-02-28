@@ -503,7 +503,7 @@ def main():
                         help='Dry run')
     parser.add_argument('--query_levels', nargs='+', default=['corp', 'team'],
                         help='The query levels to be migrated')
-    parser.add_argument('--override_project_queries', default=False,
+    parser.add_argument('--override_project_queries', action='store_true', default=False,
                         help='If a query is present on both the source and destination, override the destination query')
 
     args = parser.parse_args()
