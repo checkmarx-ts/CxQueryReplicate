@@ -229,7 +229,7 @@ def retrieve_query_groups(args):
         query_groups_levels.append(query_groups_dict[level])
 
     query_groups = [qg for qg in query_groups
-                    if qg[PACKAGE_TYPE] in query_groups_levels] #[PROJECT, TEAM, CORPORATE]]
+                    if qg[PACKAGE_TYPE] in query_groups_levels]
 
     return query_groups
 
@@ -256,7 +256,8 @@ def find_project_names(src_query_group, dst_query_groups, config):
 
     return query_group_list
 
-def update_src_query_groups(src_query_groups, dst_query_groups, team_map, config, isOverrideProjectQueries):
+
+def update_src_query_groups(src_query_groups, dst_query_groups, team_map, config, is_project_overridable):
     """Update a list of query groups with information from the destination
 
     Given a list of query groups from a source CxSAST instance, update
@@ -270,15 +271,15 @@ def update_src_query_groups(src_query_groups, dst_query_groups, team_map, config
 
     for src_query_group in src_query_groups:
         if src_query_group[PACKAGE_TYPE] == PROJECT:
-            dst_query_group_projects = find_project_names(src_query_group, dst_query_groups, config) #needs to be a list
+            dst_query_group_projects = find_project_names(src_query_group, dst_query_groups, config)
             if dst_query_group_projects:
-                set_query_group_parameters(dst_query_group_projects, src_query_group, isOverrideProjectQueries)
+                set_query_group_parameters(dst_query_group_projects, src_query_group, is_project_overridable)
             else:
-                set_query_group_parameters(config, src_query_group)
+                set_new_query_group_parameters(config, src_query_group)
         else:
             logger.debug(f'Updating query_group: {src_query_group[PACKAGE_FULL_NAME]}')
             dst_query_group = find_query_group(src_query_group,
-                                               dst_query_groups)  # match this src query group to particular dst one
+                                               dst_query_groups)
             if dst_query_group:
                 logger.debug('Query group found in destination instance')
                 logger.debug(f'Setting query group package id to {dst_query_group[PACKAGE_ID]}')
@@ -347,7 +348,7 @@ def find_destination_project(src_query_group, config):
     return None
 
 
-def set_query_group_parameters(config, src_query_group):
+def set_new_query_group_parameters(config, src_query_group):
     """Sets the parameters of the src_query_group, which will be written to the destination
 
     This scenario is if the project in the destination instance does not contain any custom queries yet, but
@@ -360,22 +361,23 @@ def set_query_group_parameters(config, src_query_group):
     src_query_group[PACKAGE_TYPE_NAME] = 'CxProject_' + str(dst_project.project_id)
     package_name = src_query_group[PACKAGE_FULL_NAME].split(':')
     src_query_group[PACKAGE_FULL_NAME] = package_name[0] + ':' + src_query_group[PACKAGE_TYPE_NAME] + ':' + \
-                                         package_name[2]
+        package_name[2]
     src_query_group[STATUS] = 'New'
     src_query_group[DESCRIPTION] = ''
 
 
-def set_query_group_parameters(dst_query_group_projects, src_query_group, isOverrideProjectQueries):
+def set_query_group_parameters(dst_query_group_projects, src_query_group, is_project_overridable):
     """Sets the parameters of the src_query_group, which will be written to the destination
 
     This scenario is if the project in the destination instance has custom queries, and
     the same project in the source destination has custom queries.
     """
-    if isOverrideProjectQueries:
+    if is_project_overridable:
         for src_query in src_query_group['Queries']:
             for query_group in dst_query_group_projects:
-                for dst_query in query_group['Queries']: #is a list, the for each is same as using index like [0]
-                    if dst_query['Cwe'] == src_query['Cwe'] and dst_query['QueryId'] == src_query['QueryId'] and dst_query['Name'] == src_query['Name']:
+                for dst_query in query_group['Queries']:
+                    if dst_query['Cwe'] == src_query['Cwe'] and dst_query['QueryId'] == src_query['QueryId'] and \
+                            dst_query['Name'] == src_query['Name']:
                         src_query['Status'] = 'Pending Delete'
 
         src_queries_filtered = [item for item in src_query_group['Queries'] if item.get('Status') != 'Pending Delete']
@@ -387,7 +389,7 @@ def set_query_group_parameters(dst_query_group_projects, src_query_group, isOver
     src_query_group[PACKAGE_TYPE_NAME] = 'CxProject_' + str(src_query_group[PROJECT_ID])
     package_name = src_query_group[PACKAGE_FULL_NAME].split(':')
     src_query_group[PACKAGE_FULL_NAME] = package_name[0] + ':' + src_query_group[PACKAGE_TYPE_NAME] + ':' + \
-                                         package_name[2]
+        package_name[2]
     src_query_group[STATUS] = 'New'
     src_query_group[DESCRIPTION] = ''
 
