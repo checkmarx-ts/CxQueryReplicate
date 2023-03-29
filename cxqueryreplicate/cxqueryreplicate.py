@@ -27,6 +27,7 @@ import logging.config
 import os.path
 import pprint
 import sys
+import pickle
 
 # Constants
 CFG_BASE_URL = 'base_url'
@@ -201,6 +202,10 @@ def replicate_queries(config, team_map, args):
         if config[CFG_MAIN].getboolean(CFG_DRY_RUN):
             logger.debug('Dry run: not uploading queries')
             return 0
+        #query_file = open('queryfile', 'wb')
+        #pickle.dump(src_query_groups, query_file)
+        #query_file.close()
+        src_loaded = pickle.load(open("C:\\Users\\cxadmin\\PycharmProjects\\CxQueryReplicate\\cxqueryreplicate\\queryfile", "rb"))
         resp = upload_queries(src_query_groups)
         if resp[IS_SUCCESSFUL]:
             logger.info('Queries loaded successfully')
