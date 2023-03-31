@@ -187,15 +187,20 @@ def replicate_teams(config):
 def replicate_queries(config, team_map, args):
     """Replicate custom queries from one CxSAST instance to another."""
     logger.debug('Starting')
+    if args.import_file:
+        desktop = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
+        src_query_groups = pickle.load(open(desktop + '\\queryfile', "rb"))
+    else:
+        src_query_groups = retrieve_query_groups(args)
 
-    src_query_groups = retrieve_query_groups(args)
     if not src_query_groups:
         logger.info('No source queries found.')
         return 0
 
     with ConfigOverride(config[CFG_DESTINATION]):
-        dst_query_groups = retrieve_query_groups(args)
-        update_src_query_groups(src_query_groups, dst_query_groups, team_map, config, args.override_project_queries)
+        if not args.import_file:
+            dst_query_groups = retrieve_query_groups(args)
+            update_src_query_groups(src_query_groups, dst_query_groups, team_map, config, args.override_project_queries)
         if logger.getEffectiveLevel() == logging.DEBUG:
             pp = pprint.PrettyPrinter(indent=2)
             logger.debug(f'src_query_groups: {pp.pformat(src_query_groups)}')
@@ -207,14 +212,12 @@ def replicate_queries(config, team_map, args):
             query_file = open(desktop + '\\queryfile', 'wb')
             pickle.dump(src_query_groups, query_file)
             query_file.close()
-        if args.import_file:
-            desktop = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
-            src_query_groups = pickle.load(open(desktop +'\\queryfile', "rb"))
-        resp = upload_queries(src_query_groups)
-        if resp[IS_SUCCESSFUL]:
-            logger.info('Queries loaded successfully')
         else:
-            logger.error(f'Error loading queries: {resp[ERROR_MESSAGE]}')
+            resp = upload_queries(src_query_groups)
+            if resp[IS_SUCCESSFUL]:
+                logger.info('Queries loaded successfully')
+            else:
+                logger.error(f'Error loading queries: {resp[ERROR_MESSAGE]}')
 
         # Re-retrieve the destination query groups to validate that
         # the upload has really been successful.
