@@ -202,10 +202,14 @@ def replicate_queries(config, team_map, args):
         if config[CFG_MAIN].getboolean(CFG_DRY_RUN):
             logger.debug('Dry run: not uploading queries')
             return 0
-        #query_file = open('queryfile', 'wb')
-        #pickle.dump(src_query_groups, query_file)
-        #query_file.close()
-        src_loaded = pickle.load(open("C:\\Users\\cxadmin\\PycharmProjects\\CxQueryReplicate\\cxqueryreplicate\\queryfile", "rb"))
+        if args.export_file:
+            desktop = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
+            query_file = open(desktop + '\\queryfile', 'wb')
+            pickle.dump(src_query_groups, query_file)
+            query_file.close()
+        if args.import_file:
+            desktop = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
+            src_query_groups = pickle.load(open(desktop +'\\queryfile', "rb"))
         resp = upload_queries(src_query_groups)
         if resp[IS_SUCCESSFUL]:
             logger.info('Queries loaded successfully')
@@ -510,6 +514,10 @@ def main():
                         help='The query levels to be migrated')
     parser.add_argument('--override_project_queries', action='store_true', default=False,
                         help='If a query is present on both the source and destination, override the destination query')
+    parser.add_argument('--export_file', action='store_true', default=False,
+                        help='Instead of transferring to destination instance, save queries from source to Desktop')
+    parser.add_argument('--import_file', action='store_true', default=False,
+                        help='Instead of pulling from destination instance, import from the queryfile')
 
     args = parser.parse_args()
 
