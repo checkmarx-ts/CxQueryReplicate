@@ -187,6 +187,11 @@ def replicate_teams(config):
 def replicate_queries(config, team_map, args):
     """Replicate custom queries from one CxSAST instance to another."""
     logger.debug('Starting')
+
+    if args.import_file and args.export_file:
+        logger.info("Cannot run in import and export mode at the same time")
+        return 0
+
     if args.import_file:
         desktop = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
         src_query_groups = pickle.load(open(desktop + '\\queryfile', "rb"))
