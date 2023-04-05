@@ -28,6 +28,7 @@ import os.path
 import pprint
 import sys
 import pickle
+import os
 
 # Constants
 CFG_BASE_URL = 'base_url'
@@ -193,8 +194,12 @@ def replicate_queries(config, team_map, args):
         return 0
 
     if args.import_file:
-        desktop = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
-        src_query_groups = pickle.load(open(desktop + '\\queryfile', "rb"))
+        if os.name == 'nt':
+            desktop = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
+            src_query_groups = pickle.load(open(desktop + '\\queryfile', "rb"))
+        else:
+            desktop = os.path.join(os.environ['HOME'])
+            src_query_groups = pickle.load(open(desktop + '/queryfile', "rb"))
     else:
         src_query_groups = retrieve_query_groups(args)
 
@@ -213,8 +218,12 @@ def replicate_queries(config, team_map, args):
             logger.debug('Dry run: not uploading queries')
             return 0
         if args.export_file:
-            desktop = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
-            query_file = open(desktop + '\\queryfile', 'wb')
+            if os.name == 'nt':
+                desktop = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
+                query_file = open(desktop + '\\queryfile', 'wb')
+            else:
+                desktop = os.path.join(os.environ['HOME'])
+                query_file = open(desktop + '/queryfile', 'wb')
             pickle.dump(src_query_groups, query_file)
             query_file.close()
         else:
