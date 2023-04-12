@@ -201,7 +201,7 @@ Example usage :
 
 ## Step 4 : Running the script 
 
-As mentioned above, the command `cxqueryreplicate` invokes the script.  However it needs additional parameters to run.  Here are a few examples : 
+As mentioned above, the command `cxqueryreplicate` invokes the script.  These commands are universal for both windows and linux.
 
 ### Run with destination file configured as ini :
 
