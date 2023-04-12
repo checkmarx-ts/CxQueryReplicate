@@ -190,7 +190,7 @@ Example usage :
 `--query_levels corp project team`
 `--query_levels team corp project`
 
-`--override_project_queries` is an optional flag.  If used, customized source instance queries will override customized destination instance queries for the same type.  If not used, no changes will occur when both the source and destination instances have customizations for the same query.  
+`--override_project_queries` is an optional flag.  If used, customized source instance queries will override customized destination instance queries for the same type.   If not used, no changes will occur when both the source and destination instances have customizations for the same query.  
 
 `--export_file` is an optional flag.  If used, this will place a file called `queryfile.json` which contains a json of all queries from the source instance.  This file will be placed in the desktop.
 
