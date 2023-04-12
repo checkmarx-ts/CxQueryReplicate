@@ -57,9 +57,30 @@ file, via the command line or by a mixture of both.
 The **CxQueryReplicate** utility uses the [Checkmarx Python SDK]()
 and, specifically, uses the SDK’s configuration to access the source CxSAST instance. The SDK configuration can be specified in any, or a mixture of, the following ways:
 
-- Via a configuration file
+- Via a configuration file (Reccomended)
 - Via environment variables
 - Via command line arguments
+
+In Windows 10, this configuration file is placed in the folder C:\Users\{username}\.Checkmarx
+
+Unless you are using the Checkmarx Python SDK for development (very unlikely for first time users), you will have to create a file in this folder named 'config.ini'
+
+The code block below is a template for the config file which already has the correct attributes, except for the base_url, username and password which is unique to each
+SAST instance
+
+```
+[checkmarx]
+base_url =your_sast_instance_url
+username =username
+password =password
+grant_type = password
+scope = sast_rest_api
+client_id = resource_owner_client
+client_secret = 014DF517-39D1-4453-B7B3-9930C563627C
+max_try = 3
+```
+
+### (Optional) More About Source Destination Customization 
 
 The default SDK configuration file is named `config.ini` and can be
 found in the `.Checkmarx` subdirectory of the user’s home
@@ -98,6 +119,16 @@ the `--cxsast_base_url` command line option could be used to specify
 the base URL of the source CxSAST instance.
 
 ## Step 2 : Configuration of Destination Settings
+
+```
+[main]
+dry_run = False
+
+[destination]
+base_url =http://172.35.0.155/
+username =admin@cx
+password =H#c2iN36M!
+```
 
 In addition to the SDK configuration parameters, the
 **CxQueryReplicate** has its own configuration parameters which
