@@ -188,7 +188,7 @@ configuration file:
 When specifying the above configuration parameter via the command
 line, `--dry_run` should be used (to enable “dry run” mode).
 
-## Step 3 : Additional Parameters 
+## (Optional) Step 3 : Additional Parameters 
 
 `--query_levels` specifies which query levels will be copied to the destination instance.  By default this is set to `corp team`.  Multiple levels can be specified, and in any order, separated by space.  The available values are `corp`, `team` and `project`
 
@@ -228,10 +228,10 @@ cxqueryreplicate --config_file C:\Users\{username}\.Checkmarx\dstconfig.ini --qu
 cxqueryreplicate --config_file C:\Users\{username}\.Checkmarx\dstconfig.ini --query_levels corp team project --export_file
 ```
 
-### Run with destination file configured as ini and import all query levels, with a file export :
+### Run with destination file configured as ini and import team + project queries, with a file import :
 
 ```
-cxqueryreplicate --config_file C:\Users\{username}\.Checkmarx\dstconfig.ini --query_levels corp team project --import_file
+cxqueryreplicate --config_file C:\Users\{username}\.Checkmarx\dstconfig.ini --query_levels team project --import_file
 ```
 
 # Development
