@@ -100,8 +100,7 @@ max_try = 3
 The default SDK configuration file is named `config.ini` and can be
 found in the `.Checkmarx` subdirectory of the user’s home
 directory. The location of the SDK configuration file can be
-overridden using the `checkmarx_config_path` environment variable or
-the `--checkmarx_config_path` command line option.
+overridden using the `checkmarx_config_path` environment variable.
 
 The SDK configuration file is a Windows-style “.ini” file, with the
 CXSAST details contained in the `checkmarx` section. The following
