@@ -127,7 +127,7 @@ parameters can be specified either via a configuration file or via
 command line options.
 
 For the sake of simplicity, it is reccomended to use a configuration file placed in the same folder as the default source configuration, which is again
-`C:\Users\{username}\.Checkmarx`.  
+`C:\Users\{username}\.Checkmarx` (Win10) or `/home/<UserName>/.Checkmarx/config.ini` (unix).  
 
 If a configuration file for the destination instance is used, the full path to it must be specified via
 the `--config_file` command line. This config file can be named anything as long as the file type is `.ini`
