@@ -76,7 +76,7 @@ and, specifically, uses the SDK’s configuration to access the source CxSAST in
 
 In Windows 10, this configuration file is placed in the folder `C:\Users\{username}\.Checkmarx`
 
-Unless you are using the Checkmarx Python SDK for development (very unlikely for first time users), you will have to create this folder, and a file in this folder named 'config.ini'
+Unless you are using the Checkmarx Python SDK for development (very unlikely for first time users), you will have to create this folder, and a file in this folder named `config.ini`
 
 The code block below is a template for the config file which already has the correct attributes, except for the base_url, username and password for the source instance
 
@@ -94,9 +94,7 @@ max_try = 3
 
 ### (Optional) More About Source Customization 
 
-The default SDK configuration file is named `config.ini` and can be
-found in the `.Checkmarx` subdirectory of the user’s home
-directory. The location of the SDK configuration file can be
+The location of the SDK configuration file and its name can be
 overridden using the `checkmarx_config_path` environment variable.
 
 The SDK configuration file is a Windows-style “.ini” file, with the
@@ -125,8 +123,7 @@ In addition to the SDK configuration parameters, the
 **CxQueryReplicate** has its own configuration parameters which
 specify the details of the destination CxSAST instance. These
 parameters can be specified either via a configuration file or via
-command line options. Configuration via environment variables is not
-supported.
+command line options.
 
 For the sake of simplicity, it is reccomended to use a configuration file placed in the same folder as the default source configuration, which is again
 `C:\Users\{username}\.Checkmarx`.  
