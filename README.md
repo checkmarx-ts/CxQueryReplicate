@@ -52,7 +52,7 @@ have added to the user’s command search path).
 The **CxQueryReplicate** utility can be configured via a configuration
 file, via the command line or by a mixture of both.
 
-# Step 1 : Configuration of Source Settings
+## Step 1 : Configuration of Source Settings
 
 The **CxQueryReplicate** utility uses the [Checkmarx Python SDK]()
 and, specifically, uses the SDK’s configuration to access the source CxSAST instance. The SDK configuration can be specified in any, or a mixture of, the following ways:
@@ -97,7 +97,7 @@ When specifying the configuration parameters via command line options,
 the `--cxsast_base_url` command line option could be used to specify
 the base URL of the source CxSAST instance.
 
-# Step 2 : Configuration of Destination Settings
+## Step 2 : Configuration of Destination Settings
 
 In addition to the SDK configuration parameters, the
 **CxQueryReplicate** has its own configuration parameters which
