@@ -178,6 +178,24 @@ configuration file:
 When specifying the above configuration parameter via the command
 line, `--dry_run` should be used (to enable “dry run” mode).
 
+## Step 3 : Additional Parameters 
+
+CxQueryReplicate has additional parameters which can be used to tailor the run towards specific use cases 
+
+`--query_levels` specifies which query levels will be copied to the destination instance.  By default this is set to `corp team`.  Multiple levels can be specified, and in any order, separated by space.  The available values are `corp`, `team` and `project`
+
+Example usage : 
+`--query_levels corp`
+`--query_levels team corp`
+`--query_levels corp project team`
+`--query_levels team corp project`
+
+`--override_project_queries` is an optional flag.  If used, customized source instance queries will override customized destination instance queries for the same type.  If not used, no changes will occur when both the source and destination instances have customizations for the same query.  
+
+`--export_file` is an optional flag.  If used, this will place a file called `queryfile.json` which contains a json of all queries from the source instance.  This file will be placed in the desktop.
+
+`--import_file` is an optional flag.  This is used to read the `queryfile.json` which is made from the export feature above.  CxQueryReplicate will search for `queryfile.json` in the desktop.
+
 # Development
 
 The easiest way to set up an environment for developing
