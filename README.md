@@ -15,7 +15,7 @@ Download the release wheel file from the [releases
 page](https://github.com/checkmarx-ts/CxQueryReplicate/releases) of
 the **CxQueryReplicate** GitHub repository. 
 
-Download example :
+Download command example (unix) :
 ```
 wget https://github.com/checkmarx-ts/CxQueryReplicate/releases/download/v1.0.1rc6/cxqueryreplicate-1.0.1rc6-py3-none-any.whl
 ```
