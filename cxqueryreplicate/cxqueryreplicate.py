@@ -29,6 +29,7 @@ import pprint
 import sys
 import pickle
 import os
+import jsonpickle
 
 # Constants
 CFG_BASE_URL = 'base_url'
@@ -196,10 +197,14 @@ def replicate_queries(config, team_map, args):
     if args.import_file:
         if os.name == 'nt':
             desktop = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
-            src_query_groups = pickle.load(open(desktop + '\\queryfile', "rb"))
+            qg_file_path = desktop + '\\queryfile.json'
+            file = open(qg_file_path, "r")
+            src_query_groups = jsonpickle.decode(file.read())
         else:
             desktop = os.path.join(os.environ['HOME'])
-            src_query_groups = pickle.load(open(desktop + '/queryfile', "rb"))
+            qg_file_path = desktop + '/queryfile.json'
+            file = open(qg_file_path, "r")
+            src_query_groups = jsonpickle.decode(file.read())
     else:
         src_query_groups = retrieve_query_groups(args)
 
@@ -220,12 +225,13 @@ def replicate_queries(config, team_map, args):
         if args.export_file:
             if os.name == 'nt':
                 desktop = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
-                query_file = open(desktop + '\\queryfile', 'wb')
+                full_path = desktop + '\\queryfile.json'
             else:
                 desktop = os.path.join(os.environ['HOME'])
-                query_file = open(desktop + '/queryfile', 'wb')
-            pickle.dump(src_query_groups, query_file)
-            query_file.close()
+                full_path = desktop + '/queryfile.json'
+            frozen = jsonpickle.encode(src_query_groups)
+            with open(full_path, "w") as text_file:
+                print(frozen, file=text_file)
         else:
             resp = upload_queries(src_query_groups)
             if resp[IS_SUCCESSFUL]:
