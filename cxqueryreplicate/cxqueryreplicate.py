@@ -27,7 +27,6 @@ import logging.config
 import os.path
 import pprint
 import sys
-import pickle
 import os
 import jsonpickle
 
@@ -532,15 +531,15 @@ def main():
     parser.add_argument('--log_level', metavar='LEVEL', default='INFO',
                         help='The log level')
     parser.add_argument('--dry_run', action='store_true', default=False,
-                        help='Dry run')
+                        help='Run program without copying queries over.  Prints out debug messages')
     parser.add_argument('--query_levels', nargs='+', default=['corp', 'team'],
-                        help='The query levels to be migrated')
+                        help='The query levels to be migrated, separated by space.  Available values : corp team project')
     parser.add_argument('--override_project_queries', action='store_true', default=False,
-                        help='If a query is present on both the source and destination, override the destination query')
+                        help='If the same query is present on both the source and destination, override the destination query')
     parser.add_argument('--export_file', action='store_true', default=False,
-                        help='Instead of transferring to destination instance, save queries from source to Desktop')
+                        help='Instead of transferring to destination instance, save queries from source into queryfile.json')
     parser.add_argument('--import_file', action='store_true', default=False,
-                        help='Instead of pulling from destination instance, import from the queryfile')
+                        help='Instead of pulling from destination instance, import from the queryfile.json stored locally')
 
     args = parser.parse_args()
 
