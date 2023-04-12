@@ -227,7 +227,7 @@ cxqueryreplicate --config_file C:\Users\{username}\.Checkmarx\dstconfig.ini --qu
 cxqueryreplicate --config_file C:\Users\{username}\.Checkmarx\dstconfig.ini --query_levels team project --import_file
 ```
 
-### Run with destination file configured as ini and import team + project queries, but destination username is specified on the command line :
+### Run with destination file configured as ini and import team + project queries, but destination username is specified on the command line (and all other destination credentials are inside the .ini) :
 
 ```
 --config_file C:\Users\cxadmin\.Checkmarx\dstconfig.ini --query_levels team project --dst_username admin@cx
