@@ -14,10 +14,15 @@ following instructions assume a Linux environment and so use the
 Download the release wheel file from the [releases
 page](https://github.com/checkmarx-ts/CxQueryReplicate/releases) of
 the **CxQueryReplicate** GitHub repository. Running the following
-comman in the directory to which the wheel file has been saved will
+command in the directory to which the wheel file has been saved will
 install **CxQueryReplicate** for the current user. To install it for
 system-wide use, omit the `--user` command line option.
 
+Download example :
+```
+wget https://github.com/checkmarx-ts/CxQueryReplicate/releases/download/v1.0.1rc6/cxqueryreplicate-1.0.1rc6-py3-none-any.whl
+
+Installation example : 
 ```
 $ pip3 install --user cxqueryreplicate-1.0.0-py3-none-any.whl
 ```
@@ -25,7 +30,7 @@ $ pip3 install --user cxqueryreplicate-1.0.0-py3-none-any.whl
 After installation, the **cxqueryreplicate** command will have been
 added to the command search path.
 
-For further isolation, the above can be performed in a virtual
+For further isolation, the installation command above can be performed in a virtual
 environment created by the **pipenv** command:
 
 ```
