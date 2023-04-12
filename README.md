@@ -234,6 +234,12 @@ cxqueryreplicate --config_file C:\Users\{username}\.Checkmarx\dstconfig.ini --qu
 cxqueryreplicate --config_file C:\Users\{username}\.Checkmarx\dstconfig.ini --query_levels team project --import_file
 ```
 
+### Run with destination file configured as ini and import team + project queries, but destination username is specified on the command line :
+
+```
+--config_file C:\Users\cxadmin\.Checkmarx\dstconfig.ini --query_levels team project --dst_username admin@cx
+```
+
 # Development
 
 The easiest way to set up an environment for developing
