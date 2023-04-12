@@ -43,6 +43,16 @@ environment, it can be installed with the following command:
 $ pip3 install --user pipenv
 ```
 
+# Before you Start : User Role Requirements
+
+The user for the source instance must have the *SAST Auditor* role.
+
+The user for the destination system must have the *Access Control
+Manager* and *SAST Auditor* roles.
+
+Both users must be members of the root team in their respective
+instances (i.e., the `/CxServer` team).
+
 # Configuration and Usage
 
 The **CxQueryReplicate** utility is invoked via the
@@ -61,12 +71,11 @@ and, specifically, uses the SDK’s configuration to access the source CxSAST in
 - Via environment variables
 - Via command line arguments
 
-In Windows 10, this configuration file is placed in the folder C:\Users\{username}\.Checkmarx
+In Windows 10, this configuration file is placed in the folder `C:\Users\{username}\.Checkmarx`
 
 Unless you are using the Checkmarx Python SDK for development (very unlikely for first time users), you will have to create a file in this folder named 'config.ini'
 
-The code block below is a template for the config file which already has the correct attributes, except for the base_url, username and password which is unique to each
-SAST instance
+The code block below is a template for the config file which already has the correct attributes, except for the base_url, username and password for the source instance
 
 ```
 [checkmarx]
@@ -80,7 +89,7 @@ client_secret = 014DF517-39D1-4453-B7B3-9930C563627C
 max_try = 3
 ```
 
-### (Optional) More About Source Destination Customization 
+### (Optional) More About Source Customization 
 
 The default SDK configuration file is named `config.ini` and can be
 found in the `.Checkmarx` subdirectory of the user’s home
@@ -120,16 +129,6 @@ the base URL of the source CxSAST instance.
 
 ## Step 2 : Configuration of Destination Settings
 
-```
-[main]
-dry_run = False
-
-[destination]
-base_url =http://172.35.0.155/
-username =admin@cx
-password =H#c2iN36M!
-```
-
 In addition to the SDK configuration parameters, the
 **CxQueryReplicate** has its own configuration parameters which
 specify the details of the destination CxSAST instance. These
@@ -138,8 +137,27 @@ command line options. Configuration via environment variables is not
 supported.
 
 There is no default location for the configuration file: if a
-configuration file is to be used, its location must be specified via
-the `--config_file` command line option.
+configuration file for the destination instance is used, the full path to it must be specified via
+the `--config_file` command line option. This config file can be named anything as long as the file type is `.ini`
+
+For the sake of simplicity, it is reccomended to place this in the same folder as the source configuration, which is again
+`C:\Users\{username}\.Checkmarx`.  
+
+Example : `--config_file C:\Users\{username}\.Checkmarx\dstconfig.ini`
+
+Here is an example of the config file below, the base_url, username and password will need to be replaced with the values for the destination SAST instance
+
+```
+[main]
+dry_run = False
+
+[destination]
+base_url =your_sast_instance_url
+username =username
+password =password
+```
+
+### (Optional) More About Destination Customization 
 
 The **CxQueryReplicate** configuration file is also a Windows-style
 “.ini” file.  The following configuration parameters must be
@@ -163,43 +181,6 @@ configuration file:
 
 When specifying the above configuration parameter via the command
 line, `--dry_run` should be used (to enable “dry run” mode).
-
-### Sample Configuration Files
-Here is a sample SDK configuration file:
-
-```
-[checkmarx]
-base_url = https://src.example.com
-username = srcuser
-password = dstpassword
-grant_type = password
-scope = sast_rest_api
-client_id = resource_owner_client
-client_secret = 014DF517-39D1-4453-B7B3-9930C563627C
-max_try = 3
-```
-
-Here is a sample **CxQueryReplicate** configuration file.
-
-```
-[main]
-dry_run = False
-
-[destination]
-base_url = https://dst.example.com
-username = dstuser
-password = dstpassword
-```
-
-# User Role Requirements
-
-The user for the source instance must have the *SAST Auditor* role.
-
-The user for the destination system must have the *Access Control
-Manager* and *SAST Auditor* roles.
-
-Both users must be members of the root team in their respective
-instances (i.e., the `/CxServer` team).
 
 # Development
 
