@@ -75,6 +75,7 @@ The **CxQueryReplicate** utility uses the [Checkmarx Python SDK]()
 and, specifically, uses the SDK’s configuration to access the source CxSAST instance. The SDK configuration is specified in a .ini file.
 
 In Windows 10, this configuration file is placed in the folder `C:\Users\{username}\.Checkmarx`
+In unix, macOSX or other linux based distros the configuration file is placed in the directory `/home/<UserName>/.Checkmarx/config.ini`
 
 Unless you are using the Checkmarx Python SDK for development (very unlikely for first time users), you will have to create this folder, and a file in this folder named `config.ini`
 
