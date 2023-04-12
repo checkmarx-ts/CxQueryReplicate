@@ -64,10 +64,10 @@ instances (i.e., the `/CxServer` team).
 
 The **CxQueryReplicate** utility is invoked via the
 **cxqueryreplicate** command (which the installation process should
-have added to the user’s command search path).
+have added to the user’s command search path).  
 
 The **CxQueryReplicate** utility can be configured via a configuration
-file, via the command line or by a mixture of both.
+file, via the command line or by a mixture of both, which will be detailed in the section below
 
 ## Step 1 : Configuration of Source Settings
 
@@ -205,6 +205,29 @@ Example usage :
 `--export_file` is an optional flag.  If used, this will place a file called `queryfile.json` which contains a json of all queries from the source instance.  This file will be placed in the desktop.
 
 `--import_file` is an optional flag.  This is used to read the json file which is made from the export feature above.  CxQueryReplicate will search for `queryfile.json` in the desktop.
+
+## Step 4 : Running the script 
+
+As mentioned above, the command `cxqueryreplicate` invokes the script.  However it needs additional parameters to run.  Here are a few examples : 
+
+### Run with destination file configured as ini :
+
+```
+cxqueryreplicate --config_file C:\Users\{username}\.Checkmarx\dstconfig.ini
+```
+
+### Run with destination file configured as ini and import all query levels :
+
+```
+cxqueryreplicate --config_file C:\Users\{username}\.Checkmarx\dstconfig.ini --query_levels corp team project
+```
+
+### Run with destination file configured as ini and import all query levels, with a file export :
+
+```
+cxqueryreplicate --config_file C:\Users\{username}\.Checkmarx\dstconfig.ini --query_levels corp team project --export_file
+```
+
 
 # Development
 
