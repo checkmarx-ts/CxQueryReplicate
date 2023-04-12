@@ -228,6 +228,11 @@ cxqueryreplicate --config_file C:\Users\{username}\.Checkmarx\dstconfig.ini --qu
 cxqueryreplicate --config_file C:\Users\{username}\.Checkmarx\dstconfig.ini --query_levels corp team project --export_file
 ```
 
+### Run with destination file configured as ini and import all query levels, with a file export :
+
+```
+cxqueryreplicate --config_file C:\Users\{username}\.Checkmarx\dstconfig.ini --query_levels corp team project --import_file
+```
 
 # Development
 
