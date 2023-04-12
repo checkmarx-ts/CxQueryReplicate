@@ -180,8 +180,6 @@ line, `--dry_run` should be used (to enable “dry run” mode).
 
 ## Step 3 : Additional Parameters 
 
-CxQueryReplicate has additional parameters which can be used to tailor the run towards specific use cases 
-
 `--query_levels` specifies which query levels will be copied to the destination instance.  By default this is set to `corp team`.  Multiple levels can be specified, and in any order, separated by space.  The available values are `corp`, `team` and `project`
 
 Example usage : 
