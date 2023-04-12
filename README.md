@@ -2,10 +2,7 @@
 # Introduction
 
 **CxQueryReplicate** is a utility that replicates customized CxSAST
-queries from one CxSAST instance to another. The current version of
-**CxQueryReplicate** only supports replication of queries customized
-at the corporate and team levels. Replication of queries customized at
-the project level is an enhancement that is planned for the future.
+queries from one CxSAST instance to another. 
 
 # Installation
 
@@ -73,7 +70,7 @@ and, specifically, uses the SDK’s configuration to access the source CxSAST in
 
 In Windows 10, this configuration file is placed in the folder `C:\Users\{username}\.Checkmarx`
 
-Unless you are using the Checkmarx Python SDK for development (very unlikely for first time users), you will have to create a file in this folder named 'config.ini'
+Unless you are using the Checkmarx Python SDK for development (very unlikely for first time users), you will have to create this folder, and a file in this folder named 'config.ini'
 
 The code block below is a template for the config file which already has the correct attributes, except for the base_url, username and password for the source instance
 
@@ -136,12 +133,11 @@ parameters can be specified either via a configuration file or via
 command line options. Configuration via environment variables is not
 supported.
 
-There is no default location for the configuration file: if a
-configuration file for the destination instance is used, the full path to it must be specified via
-the `--config_file` command line option. This config file can be named anything as long as the file type is `.ini`
-
-For the sake of simplicity, it is reccomended to place this in the same folder as the source configuration, which is again
+For the sake of simplicity, it is reccomended to use a configuration file placed in the same folder as the default source configuration, which is again
 `C:\Users\{username}\.Checkmarx`.  
+
+If a configuration file for the destination instance is used, the full path to it must be specified via
+the `--config_file` command line. This config file can be named anything as long as the file type is `.ini`
 
 Example : `--config_file C:\Users\{username}\.Checkmarx\dstconfig.ini`
 
