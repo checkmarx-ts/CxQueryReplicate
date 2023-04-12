@@ -23,7 +23,7 @@ wget https://github.com/checkmarx-ts/CxQueryReplicate/releases/download/v1.0.1rc
 Running the following
 command in the directory to which the wheel file has been saved will
 install **CxQueryReplicate** for the current user.  To install it for
-system-wide use, omit the `--user` command line option.**
+system-wide use, omit the `--user` command line option.
 
 Installation example : 
 ```
