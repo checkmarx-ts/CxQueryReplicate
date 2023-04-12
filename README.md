@@ -21,6 +21,7 @@ system-wide use, omit the `--user` command line option.
 Download example :
 ```
 wget https://github.com/checkmarx-ts/CxQueryReplicate/releases/download/v1.0.1rc6/cxqueryreplicate-1.0.1rc6-py3-none-any.whl
+```
 
 Installation example : 
 ```
