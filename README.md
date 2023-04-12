@@ -183,10 +183,12 @@ line, `--dry_run` should be used (to enable “dry run” mode).
 `--query_levels` specifies which query levels will be copied to the destination instance.  By default this is set to `corp team`.  Multiple levels can be specified, and in any order, separated by space.  The available values are `corp`, `team` and `project`
 
 Example usage : 
-`--query_levels corp`
-`--query_levels team corp`
-`--query_levels corp project team`
-`--query_levels team corp project`
+```
+--query_levels corp
+--query_levels team corp
+--query_levels corp project team
+--query_levels team corp project
+```
 
 `--override_project_queries` is an optional flag.  If used, customized source instance queries will override customized destination instance queries for the same type.   If not used, no changes will occur when both the source and destination instances have customizations for the same query.  
 
