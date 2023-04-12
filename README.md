@@ -194,7 +194,7 @@ Example usage :
 
 `--export_file` is an optional flag.  If used, this will place a file called `queryfile.json` which contains a json of all queries from the source instance.  This file will be placed in the desktop.
 
-`--import_file` is an optional flag.  This is used to read the `queryfile.json` which is made from the export feature above.  CxQueryReplicate will search for `queryfile.json` in the desktop.
+`--import_file` is an optional flag.  This is used to read the json file which is made from the export feature above.  CxQueryReplicate will search for `queryfile.json` in the desktop.
 
 # Development
 
