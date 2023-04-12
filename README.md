@@ -33,6 +33,8 @@ $ pip3 install --user cxqueryreplicate-1.0.0-py3-none-any.whl
 After installation, the **cxqueryreplicate** command will have been
 added to the command search path.
 
+### (Optional) Installation in pipenv
+
 For further isolation, the installation command above can be performed in a virtual
 environment created by the **pipenv** command:
 
