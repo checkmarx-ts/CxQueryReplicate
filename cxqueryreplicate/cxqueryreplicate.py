@@ -404,7 +404,7 @@ def set_query_group_parameters(dst_query_group_projects, src_query_group, is_pro
     This scenario is if the project in the destination instance has custom queries, and
     the same project in the source destination has custom queries.
     """
-    if is_project_overridable:
+    if not is_project_overridable:
         for src_query in src_query_group['Queries']:
             for query_group in dst_query_group_projects:
                 for dst_query in query_group['Queries']:
