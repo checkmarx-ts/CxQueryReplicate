@@ -76,7 +76,6 @@ and, specifically, uses the SDK’s configuration to access the source CxSAST in
 
 - Via a configuration file (Reccomended)
 - Via environment variables
-- Via command line arguments
 
 In Windows 10, this configuration file is placed in the folder `C:\Users\{username}\.Checkmarx`
 
@@ -128,11 +127,6 @@ When specifying the configuration parameters via environment
 variables, “cxsast_” should be prepended to the parameter name. For
 example, the `cxsast_base_url` environment variable could be used to
 specify the base URL of the source CxSAST instance.
-
-When specifying the configuration parameters via command line options,
-“--cxsast_” should be prepended to the parameter name. For example,
-the `--cxsast_base_url` command line option could be used to specify
-the base URL of the source CxSAST instance.
 
 ## Step 2 : Configuration of Destination Settings
 
