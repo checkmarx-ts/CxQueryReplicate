@@ -103,13 +103,13 @@ CXSAST details contained in the `checkmarx` section. The following
 parameters *must* be configured:
 
 - `base_url`: The base URL of the source CxSAST instance.
-- `client_id`: The clint identifier sent in the authorization token
+- `client_id`: The client identifier sent in the authorization token
   request. This must always be “resource_owner_client”.
 - `client_secret`: The client secret sent in the authorization token
   request. This must always be “014DF517-39D1-4453-B7B3-9930C563627C”.
 - `grant_type`: The grant type sent in the authorization token
   request. This must always be “password”.
-- `max_try`: Te maximum number of times to retry an API operation
+- `max_try`: The maximum number of times to retry an API operation
   which has failed.
 - `password`: The password of the user with which to connect to the
   source CxSAST instance.
@@ -126,7 +126,7 @@ specify the details of the destination CxSAST instance. These
 parameters can be specified either via a configuration file or via
 command line options.
 
-For the sake of simplicity, it is reccomended to use a configuration file placed in the same folder as the default source configuration, which is again
+For the sake of simplicity, it is recommended to use a configuration file placed in the same folder as the default source configuration, which is again
 `C:\Users\{username}\.Checkmarx` (Win10) or `/home/<UserName>/.Checkmarx/config.ini` (unix).  
 
 If a configuration file for the destination instance is used, the full path to it must be specified via
