@@ -17,7 +17,7 @@ the **CxQueryReplicate** GitHub repository.
 
 Download command example (unix) :
 ```
-wget https://github.com/checkmarx-ts/CxQueryReplicate/releases/download/v1.0.1rc6/cxqueryreplicate-1.0.1rc6-py3-none-any.whl
+wget https://github.com/checkmarx-ts/CxQueryReplicate/releases/download/v1.0.0/cxqueryreplicate-1.0.0-py3-none-any.whl
 ```
 
 Running the following
