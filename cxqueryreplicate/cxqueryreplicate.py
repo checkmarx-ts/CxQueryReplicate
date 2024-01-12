@@ -29,6 +29,7 @@ import pprint
 import sys
 import os
 import jsonpickle
+from http.client import HTTPConnection
 
 # Constants
 CFG_BASE_URL = 'base_url'
@@ -522,6 +523,8 @@ def main():
     parser = argparse.ArgumentParser(description='Replicate CxSAST custom queries')
     parser.add_argument('--config_file', metavar='FILE',
                         help='The configuration file')
+    parser.add_argument('--debug_http', action='store_true', default=False,
+                        help='Enable printing of HTML requests and responses')
     parser.add_argument('--dst_base_url', metavar='BASE_URL',
                         help='The base URL of the destination CxSAST instance')
     parser.add_argument('--dst_username', metavar='USERNAME',
@@ -544,6 +547,9 @@ def main():
     args = parser.parse_args()
 
     setup_logger(__name__, args.log_level.upper())
+    if args.debug_http:
+        HTTPConnection.debuglevel = 1
+
     try:
         logger.info('Starting')
         config = load_config(args)
